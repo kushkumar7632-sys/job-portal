@@ -272,12 +272,12 @@
 
 
             <!-- Security -->
-            <div class="mt-6 text-center
+            <!-- <div class="mt-6 text-center
                         text-sm text-slate-400">
 
                 🔒 Your information is securely protected.
 
-            </div>
+            </div> -->
 
         </div>
 

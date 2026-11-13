@@ -2,279 +2,222 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Applications | JobPortal</title>
 
     @vite('resources/css/app.css')
-
 </head>
 
+@php
+    $studentName = session('student_name', 'Student');
+    $studentInitial = strtoupper(substr($studentName, 0, 1));
+@endphp
 
-<body class="bg-slate-50 min-h-screen text-slate-800">
+<body class="min-h-screen flex flex-col bg-[#f4f6f8] text-[#202b38] antialiased">
 
+    <!-- HEADER -->
+    <header class="w-full border-b border-slate-200 bg-white">
 
-    <!-- ================= NAVBAR ================= -->
+        <div class="flex h-[76px] items-center justify-between px-6 md:px-10 xl:px-14">
 
-    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+            <a href="{{ route('student.jobs') }}" class="flex items-center gap-3">
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <span class="flex h-10 w-10 items-center justify-center rounded-md bg-[#24496b] text-lg font-bold text-white">
+                    J
+                </span>
 
-            <div class="h-16 flex items-center justify-between">
+                <span class="text-xl font-semibold tracking-tight text-[#172b40]">
+                    JobPortal
+                </span>
 
-
-                <!-- Logo -->
-
-                <a href="{{ route('student.jobs') }}"
-                   class="flex items-center gap-2">
-
-                    <div class="w-9 h-9 bg-blue-600
-                                rounded-lg flex items-center
-                                justify-center">
-
-                        <span class="text-white font-bold text-lg">
-                            J
-                        </span>
-
-                    </div>
-
-                    <span class="text-xl font-bold text-slate-900">
-
-                        Job<span class="text-blue-600">Portal</span>
-
-                    </span>
-
-                </a>
+            </a>
 
 
-                <!-- Right -->
+            <div class="flex items-center gap-4 md:gap-6">
 
-                <div class="flex items-center gap-3">
+                <div class="hidden text-right sm:block">
 
+                    <p class="text-[11px] font-medium uppercase tracking-wider text-slate-400">
+                        Signed in as
+                    </p>
 
-                    <div class="hidden sm:block text-right">
-
-                        <p class="text-xs text-slate-400">
-                            Logged in as
-                        </p>
-
-                        <p class="text-sm font-semibold text-slate-700">
-
-                            {{ session('student_name') }}
-
-                        </p>
-
-                    </div>
-
-
-                    <!-- Avatar -->
-
-                    <div class="w-10 h-10 rounded-full
-                                bg-blue-100 text-blue-600
-                                flex items-center justify-center
-                                font-bold">
-
-                        {{ strtoupper(substr(session('student_name'), 0, 1)) }}
-
-                    </div>
-
-
-                    <!-- Dashboard -->
-
-                    <a href="{{ route('student.dashboard') }}"
-                       class="hidden sm:inline-flex
-                              items-center
-                              bg-blue-600
-                              hover:bg-blue-700
-                              text-white
-                              px-4 py-2
-                              rounded-lg
-                              font-medium
-                              transition">
-
-                        Dashboard
-
-                    </a>
+                    <p class="mt-1 text-sm font-semibold text-slate-800">
+                        {{ $studentName }}
+                    </p>
 
                 </div>
+
+
+                <div class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-slate-100 font-semibold text-[#294765]">
+                    {{ $studentInitial }}
+                </div>
+
+
+                <a href="{{ route('student.dashboard') }}"
+                   class="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+
+                    Dashboard
+
+                </a>
 
             </div>
 
         </div>
 
-    </nav>
+    </header>
 
 
-
-    <!-- ================= MAIN ================= -->
-
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- MAIN CONTENT -->
+    <main class="w-full flex-1 px-5 py-8 md:px-10 xl:px-14 xl:py-10">
 
 
-        <!-- Page Header -->
-
-        <div class="flex flex-col md:flex-row
-                    md:items-center md:justify-between
-                    gap-4 mb-8">
-
+        <!-- PAGE HEADING -->
+        <section class="mb-8 flex flex-col justify-between gap-5 border-b border-slate-200 pb-8 md:flex-row md:items-end">
 
             <div>
 
-                <div class="flex items-center gap-2
-                            text-sm text-slate-500 mb-2">
+                <nav class="mb-4 flex items-center gap-2 text-xs font-medium text-slate-400">
 
-                    <a href="{{ route('student.dashboard') }}"
-                       class="hover:text-blue-600">
-
+                    <a href="{{ route('student.dashboard') }}" class="hover:text-[#24496b]">
                         Dashboard
-
                     </a>
 
-                    <span>›</span>
+                    <span>/</span>
 
-                    <span>My Applications</span>
+                    <span class="text-slate-600">
+                        My Applications
+                    </span>
 
-                </div>
+                </nav>
 
 
-                <h1 class="text-3xl font-bold text-slate-900">
+                <p class="text-xs font-semibold uppercase tracking-[0.15em] text-[#607b95]">
+                    YOUR JOB SEARCH
+                </p>
 
+
+                <h1 class="mt-2 text-3xl font-semibold tracking-tight text-[#172b40] lg:text-4xl">
                     My Applications
-
                 </h1>
 
 
-                <p class="text-slate-500 mt-2">
-
-                    Track and manage the jobs you have applied for.
-
+                <p class="mt-3 text-sm leading-6 text-slate-500">
+                    Review the positions you have applied for and follow the latest status of each application.
                 </p>
 
             </div>
 
 
-            <!-- Browse Jobs -->
-
             <a href="{{ route('student.jobs') }}"
-               class="inline-flex items-center justify-center
-                      bg-blue-600 hover:bg-blue-700
-                      text-white
-                      px-5 py-3
-                      rounded-xl
-                      font-semibold
-                      shadow-sm
-                      transition">
+               class="inline-flex h-11 items-center justify-center gap-3 self-start rounded-md bg-[#24496b] px-5 text-sm font-semibold text-white transition hover:bg-[#193a59] md:self-auto">
 
-                Find More Jobs
+                Browse Jobs
 
-                <span class="ml-2">→</span>
+                <svg class="h-4 w-4" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="1.8">
+
+                    <path d="M5 12h14M13 6l6 6-6 6"/>
+
+                </svg>
 
             </a>
 
-        </div>
+        </section>
 
 
-
+        <!-- APPLICATION LIST -->
         @if($applications->count() > 0)
 
-
-            <!-- ================= APPLICATIONS ================= -->
-
-            <div class="space-y-5">
-
+            <section class="w-full space-y-5">
 
                 @foreach($applications as $application)
 
+                    <article class="w-full border border-slate-200 bg-white transition hover:border-slate-300 hover:shadow-sm">
 
-                    <div class="bg-white
-                                border border-slate-200
-                                rounded-2xl
-                                shadow-sm
-                                hover:shadow-md
-                                transition duration-200
-                                overflow-hidden">
+                        <div class="p-6 md:p-7 xl:p-8">
+
+                            <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
 
 
-                        <div class="p-5 sm:p-6">
+                                <!-- JOB DETAILS -->
+                                <div class="flex min-w-0 items-start gap-5">
 
-
-                            <div class="flex flex-col
-                                        lg:flex-row
-                                        lg:items-center
-                                        lg:justify-between
-                                        gap-6">
-
-
-                                <!-- LEFT -->
-
-                                <div class="flex gap-4">
-
-
-                                    <!-- Company/Job Icon -->
-
-                                    <div class="hidden sm:flex
-                                                flex-shrink-0
-                                                w-14 h-14
-                                                rounded-xl
-                                                bg-blue-50
-                                                text-blue-600
-                                                items-center
-                                                justify-center
-                                                text-xl
-                                                font-bold">
+                                    <div class="hidden h-14 w-14 shrink-0 items-center justify-center rounded-md border border-slate-200 bg-slate-50 text-xl font-semibold text-[#315675] sm:flex">
 
                                         {{ strtoupper(substr($application->job->job_title, 0, 1)) }}
 
                                     </div>
 
 
-                                    <div>
+                                    <div class="min-w-0">
+
+                                        <p class="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                                            APPLIED POSITION
+                                        </p>
 
 
-                                        <!-- Job Title -->
-
-                                        <h2 class="text-xl font-bold
-                                                   text-slate-900">
-
+                                        <h2 class="break-words text-xl font-semibold text-[#1d3044] lg:text-2xl">
                                             {{ $application->job->job_title }}
-
                                         </h2>
 
 
-                                        <!-- Job Details -->
-
-                                        <div class="flex flex-wrap
-                                                    gap-x-5 gap-y-2
-                                                    mt-3
-                                                    text-sm
-                                                    text-slate-500">
+                                        <!-- JOB INFORMATION -->
+                                        <div class="mt-4 flex flex-wrap gap-x-7 gap-y-3 text-sm text-slate-500">
 
 
-                                            <span class="flex items-center gap-1">
+                                            <!-- LOCATION -->
+                                            <span class="inline-flex items-center gap-2">
 
-                                                <span>📍</span>
+                                                <svg class="h-[18px] w-[18px] text-slate-400"
+                                                     viewBox="0 0 24 24"
+                                                     fill="none"
+                                                     stroke="currentColor"
+                                                     stroke-width="1.7">
+
+                                                    <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/>
+
+                                                    <circle cx="12" cy="10" r="2.5"/>
+
+                                                </svg>
 
                                                 {{ $application->job->location }}
 
                                             </span>
 
 
-                                            <span class="flex items-center gap-1">
+                                            <!-- JOB TYPE -->
+                                            <span class="inline-flex items-center gap-2">
 
-                                                <span>💼</span>
+                                                <svg class="h-[18px] w-[18px] text-slate-400"
+                                                     viewBox="0 0 24 24"
+                                                     fill="none"
+                                                     stroke="currentColor"
+                                                     stroke-width="1.7">
+
+                                                    <rect x="3" y="7" width="18" height="13" rx="1.5"/>
+
+                                                    <path d="M8 7V4h8v3M3 12h18"/>
+
+                                                </svg>
 
                                                 {{ $application->job->job_type }}
 
                                             </span>
 
 
-                                            <span class="flex items-center gap-1">
+                                            <!-- SALARY -->
+                                            <span class="inline-flex items-center gap-2">
 
-                                                <span>💰</span>
+                                                <svg class="h-[18px] w-[18px] text-slate-400"
+                                                     viewBox="0 0 24 24"
+                                                     fill="none"
+                                                     stroke="currentColor"
+                                                     stroke-width="1.7">
+
+                                                    <path d="M12 3v18M17 7.5c0-1.7-1.9-3-5-3s-5 1.3-5 3 1.5 2.5 5 3 5 1.3 5 3-1.9 3-5 3-5-1.3-5-3"/>
+
+                                                </svg>
 
                                                 {{ $application->job->salary }}
 
@@ -283,57 +226,36 @@
                                         </div>
 
 
-                                        <!-- Applied Date -->
+                                        <!-- APPLICATION DATE -->
+                                        <p class="mt-5 text-xs text-slate-400">
 
-                                        <div class="flex items-center
-                                                    gap-2 mt-4
-                                                    text-sm text-slate-400">
+                                            Applied on
 
-                                            <span>Applied on</span>
-
-                                            <span class="font-medium
-                                                         text-slate-600">
+                                            <span class="ml-1 font-semibold text-slate-600">
 
                                                 {{ $application->created_at->format('d M Y') }}
 
                                             </span>
 
-                                        </div>
+                                        </p>
 
                                     </div>
 
                                 </div>
 
 
-
-                                <!-- RIGHT -->
-
-                                <div class="flex flex-col
-                                            lg:items-end
-                                            gap-3
-                                            lg:min-w-[180px]">
+                                <!-- STATUS AND ACTIONS -->
+                                <div class="flex shrink-0 flex-col gap-4 border-t border-slate-100 pt-5 lg:min-w-[230px] lg:items-end lg:border-0 lg:pt-0">
 
 
                                     <!-- STATUS -->
-
                                     <div>
 
                                         @if($application->status === 'Pending')
 
-                                            <span class="inline-flex
-                                                         items-center gap-2
-                                                         px-4 py-2
-                                                         rounded-full
-                                                         bg-amber-50
-                                                         border border-amber-200
-                                                         text-amber-700
-                                                         font-semibold
-                                                         text-sm">
+                                            <span class="inline-flex items-center gap-2 border border-[#f1dfb7] bg-[#fffaf0] px-4 py-2 text-xs font-semibold text-[#91651c]">
 
-                                                <span class="w-2 h-2
-                                                             bg-amber-500
-                                                             rounded-full">
-                                                </span>
+                                                <span class="h-2 w-2 rounded-full bg-[#c58b2c]"></span>
 
                                                 Pending
 
@@ -342,20 +264,9 @@
 
                                         @elseif($application->status === 'Shortlisted')
 
-                                            <span class="inline-flex
-                                                         items-center gap-2
-                                                         px-4 py-2
-                                                         rounded-full
-                                                         bg-blue-50
-                                                         border border-blue-200
-                                                         text-blue-700
-                                                         font-semibold
-                                                         text-sm">
+                                            <span class="inline-flex items-center gap-2 border border-[#cbdced] bg-[#f2f7fc] px-4 py-2 text-xs font-semibold text-[#315f89]">
 
-                                                <span class="w-2 h-2
-                                                             bg-blue-500
-                                                             rounded-full">
-                                                </span>
+                                                <span class="h-2 w-2 rounded-full bg-[#4d80ad]"></span>
 
                                                 Shortlisted
 
@@ -364,20 +275,9 @@
 
                                         @elseif($application->status === 'Selected')
 
-                                            <span class="inline-flex
-                                                         items-center gap-2
-                                                         px-4 py-2
-                                                         rounded-full
-                                                         bg-green-50
-                                                         border border-green-200
-                                                         text-green-700
-                                                         font-semibold
-                                                         text-sm">
+                                            <span class="inline-flex items-center gap-2 border border-[#cce5d8] bg-[#f2faf5] px-4 py-2 text-xs font-semibold text-[#28734b]">
 
-                                                <span class="w-2 h-2
-                                                             bg-green-500
-                                                             rounded-full">
-                                                </span>
+                                                <span class="h-2 w-2 rounded-full bg-[#399765]"></span>
 
                                                 Selected
 
@@ -386,20 +286,9 @@
 
                                         @elseif($application->status === 'Rejected')
 
-                                            <span class="inline-flex
-                                                         items-center gap-2
-                                                         px-4 py-2
-                                                         rounded-full
-                                                         bg-red-50
-                                                         border border-red-200
-                                                         text-red-700
-                                                         font-semibold
-                                                         text-sm">
+                                            <span class="inline-flex items-center gap-2 border border-[#efd0d0] bg-[#fff6f6] px-4 py-2 text-xs font-semibold text-[#a34444]">
 
-                                                <span class="w-2 h-2
-                                                             bg-red-500
-                                                             rounded-full">
-                                                </span>
+                                                <span class="h-2 w-2 rounded-full bg-[#bd5b5b]"></span>
 
                                                 Rejected
 
@@ -410,50 +299,41 @@
                                     </div>
 
 
-
-                                    <!-- ACTIONS -->
-
-                                    <div class="flex flex-wrap
-                                                items-center gap-4">
-
-
-                                        <!-- View Job -->
+                                    <!-- ACTION LINKS -->
+                                    <div class="flex flex-wrap items-center gap-5 text-sm">
 
                                         <a href="{{ route('student.job.details', $application->job_id) }}"
-                                           class="text-blue-600
-                                                  hover:text-blue-800
-                                                  font-semibold
-                                                  text-sm
-                                                  transition">
+                                           class="font-semibold text-[#315f86] transition hover:text-[#193d5e]">
 
-                                            View Job →
+                                            View Job Details
 
                                         </a>
 
 
-                                        <!-- Resume -->
-
                                         @if($application->resume)
 
-                                            <span class="inline-flex
-                                                         items-center gap-1
-                                                         text-green-600
-                                                         text-sm
-                                                         font-semibold">
+                                            <span class="inline-flex items-center gap-2 font-medium text-[#367653]">
 
-                                                ✓ Resume Uploaded
+                                                <svg class="h-4 w-4"
+                                                     viewBox="0 0 24 24"
+                                                     fill="none"
+                                                     stroke="currentColor"
+                                                     stroke-width="1.8">
+
+                                                    <path d="m5 12 4 4L19 6"/>
+
+                                                </svg>
+
+                                                Resume Uploaded
 
                                             </span>
 
                                         @else
 
                                             <a href="{{ route('student.resume.upload', $application->job_id) }}"
-                                               class="text-orange-600
-                                                      hover:text-orange-700
-                                                      text-sm
-                                                      font-semibold">
+                                               class="font-semibold text-[#9a6a25] hover:text-[#754c16]">
 
-                                                Upload Resume →
+                                                Upload Resume
 
                                             </a>
 
@@ -468,19 +348,14 @@
                         </div>
 
 
-                        <!-- Bottom Status Strip -->
-
+                        <!-- STATUS MESSAGE -->
                         @if($application->status === 'Selected')
 
-                            <div class="bg-green-50
-                                        border-t border-green-100
-                                        px-5 py-3">
+                            <div class="border-t border-[#dcebe1] bg-[#f5faf6] px-6 py-4 md:px-8">
 
-                                <p class="text-sm text-green-700
-                                          font-medium">
+                                <p class="text-sm font-medium text-[#34734f]">
 
-                                    🎉 Congratulations! You have been selected
-                                    for this position.
+                                    Your application has been selected for this position.
 
                                 </p>
 
@@ -489,15 +364,11 @@
 
                         @elseif($application->status === 'Shortlisted')
 
-                            <div class="bg-blue-50
-                                        border-t border-blue-100
-                                        px-5 py-3">
+                            <div class="border-t border-[#dce6f0] bg-[#f5f8fc] px-6 py-4 md:px-8">
 
-                                <p class="text-sm text-blue-700
-                                          font-medium">
+                                <p class="text-sm font-medium text-[#416b91]">
 
-                                    Your application has been shortlisted.
-                                    Keep an eye on your application status.
+                                    Your application has been shortlisted. Please check your application status for further updates.
 
                                 </p>
 
@@ -505,105 +376,98 @@
 
                         @endif
 
-
-                    </div>
-
+                    </article>
 
                 @endforeach
 
-
-            </div>
+            </section>
 
 
         @else
 
 
-            <!-- ================= EMPTY STATE ================= -->
-
-            <div class="bg-white
-                        border border-slate-200
-                        rounded-2xl
-                        shadow-sm
-                        p-10 sm:p-16
-                        text-center">
+            <!-- EMPTY STATE -->
+            <section class="flex min-h-[420px] w-full flex-col items-center justify-center border border-slate-200 bg-white px-6 py-16 text-center">
 
 
-                <div class="mx-auto w-20 h-20
-                            bg-blue-50
-                            rounded-2xl
-                            flex items-center justify-center
-                            text-4xl">
+                <div class="flex h-16 w-16 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-slate-500">
 
-                    📋
+                    <svg class="h-8 w-8"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="1.5">
+
+                        <rect x="5" y="3.5" width="14" height="17" rx="1.5"/>
+
+                        <path d="M8.5 8h7M8.5 12h7M8.5 16h4"/>
+
+                    </svg>
 
                 </div>
 
 
-                <h2 class="text-2xl font-bold
-                           text-slate-900 mt-6">
+                <p class="mt-6 text-xs font-semibold uppercase tracking-widest text-slate-400">
 
-                    No Applications Yet
+                    APPLICATION ACTIVITY
+
+                </p>
+
+
+                <h2 class="mt-3 text-2xl font-semibold text-[#1d3044]">
+
+                    You haven't applied for any jobs yet
 
                 </h2>
 
 
-                <p class="text-slate-500
-                          max-w-md mx-auto
-                          mt-2 leading-6">
+                <p class="mt-3 max-w-lg text-sm leading-6 text-slate-500">
 
-                    You haven't applied for any jobs yet.
-                    Explore available opportunities and start
-                    building your career today.
+                    When you apply for a position, it will appear here so you can review the details and track its status.
 
                 </p>
 
 
                 <a href="{{ route('student.jobs') }}"
-                   class="inline-flex items-center
-                          mt-6
-                          bg-blue-600
-                          hover:bg-blue-700
-                          text-white
-                          px-6 py-3
-                          rounded-xl
-                          font-semibold
-                          shadow-sm
-                          transition">
+                   class="mt-7 inline-flex h-11 items-center justify-center gap-3 rounded-md bg-[#24496b] px-6 text-sm font-semibold text-white transition hover:bg-[#193a59]">
 
                     Browse Available Jobs
 
-                    <span class="ml-2">→</span>
+                    <svg class="h-4 w-4"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="1.8">
+
+                        <path d="M5 12h14M13 6l6 6-6 6"/>
+
+                    </svg>
 
                 </a>
 
-            </div>
-
+            </section>
 
         @endif
-
 
     </main>
 
 
+    <!-- FOOTER -->
+    <footer class="w-full border-t border-slate-200 bg-white">
 
-    <!-- ================= FOOTER ================= -->
+        <div class="flex flex-col justify-between gap-3 px-6 py-6 text-xs text-slate-400 sm:flex-row sm:items-center md:px-10 xl:px-14">
 
-    <footer class="border-t border-slate-200 mt-10">
+            <p>
+                &copy; {{ date('Y') }} JobPortal. All rights reserved.
+            </p>
 
-        <div class="max-w-7xl mx-auto px-4
-                    py-6 text-center">
-
-            <p class="text-sm text-slate-400">
-
-                © {{ date('Y') }} JobPortal. All rights reserved.
-
+            <p>
+                Student Workspace
             </p>
 
         </div>
 
     </footer>
 
-
 </body>
-
 </html>
