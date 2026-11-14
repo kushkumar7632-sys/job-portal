@@ -92,10 +92,18 @@ class ApplicationController extends Controller
         // Perform physical file cleanup only after database transaction commits
         // and only if the file is NOT shared by any other application
         if (!empty($resumePath) && !$isResumeShared) {
-            if (Storage::disk('local')->exists($resumePath)) {
-                Storage::disk('local')->delete($resumePath);
-            } elseif (Storage::disk('public')->exists($resumePath)) {
-                Storage::disk('public')->delete($resumePath);
+            $configuredDisk = config('filesystems.resume_disk', 'local');
+            $disksToCheck = array_unique([$configuredDisk, 'local', 'public']);
+
+            foreach ($disksToCheck as $disk) {
+                try {
+                    if (Storage::disk($disk)->exists($resumePath)) {
+                        Storage::disk($disk)->delete($resumePath);
+                        break;
+                    }
+                } catch (\Throwable $e) {
+                    // Continue checking other disks
+                }
             }
         }
 

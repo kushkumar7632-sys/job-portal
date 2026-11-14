@@ -9,6 +9,7 @@ use App\Models\Student;
 use App\Models\Company;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class StudentJobController extends Controller
@@ -160,15 +161,22 @@ public function uploadResume(Request $request, $id)
     if ($request->hasFile('resume')) {
         $file = $request->file('resume');
 
-        // Randomized, unguessable filename stored outside public directory (storage/app/private/resumes)
+        // Randomized, unguessable filename stored outside public directory
         $extension = $file->getClientOriginalExtension();
         $filename = 'resume_' . Str::random(40) . '.' . $extension;
         $newPath = 'resumes/' . $filename;
 
-        // 1. Store the new file first in private storage ('local' disk)
-        $stored = $file->storeAs('resumes', $filename, 'local');
-        if (!$stored) {
-            return back()->with('error', 'Failed to store resume file. Please try again.');
+        $uploadDisk = config('filesystems.resume_disk', 'local');
+
+        // 1. Store the new file on configured resume storage disk (local or Cloudflare R2)
+        try {
+            $stored = $file->storeAs('resumes', $filename, $uploadDisk);
+            if (!$stored) {
+                return back()->with('error', 'Failed to store resume file. Please try again.');
+            }
+        } catch (\Throwable $e) {
+            Log::error('Resume storage error: ' . $e->getMessage(), ['exception' => $e]);
+            return back()->with('error', 'Unable to upload resume due to a storage service error. Please try again later.');
         }
 
         $oldResume = $application->resume;
@@ -179,15 +187,27 @@ public function uploadResume(Request $request, $id)
                 'resume' => $newPath,
             ]);
         } catch (\Throwable $e) {
-            // If database update fails, delete newly uploaded file and preserve old resume
-            Storage::disk('local')->delete($newPath);
+            // If database update fails, delete newly uploaded file from the upload disk
+            try {
+                Storage::disk($uploadDisk)->delete($newPath);
+            } catch (\Throwable $deleteEx) {
+                // Ignore cleanup error
+            }
             throw $e;
         }
 
-        // 3. Delete previous file only after replacement upload succeeds (only delete from private storage)
+        // 3. Delete previous file only after replacement upload succeeds
         if ($oldResume && $oldResume !== $newPath) {
-            if (Storage::disk('local')->exists($oldResume)) {
-                Storage::disk('local')->delete($oldResume);
+            $disksToCheck = array_unique([$uploadDisk, 'local', 'public']);
+            foreach ($disksToCheck as $oldDisk) {
+                try {
+                    if (Storage::disk($oldDisk)->exists($oldResume)) {
+                        Storage::disk($oldDisk)->delete($oldResume);
+                        break;
+                    }
+                } catch (\Throwable $e) {
+                    // Continue checking other disks
+                }
             }
         }
     }
@@ -236,12 +256,20 @@ public function downloadResume(Request $request, $id)
         abort(403, 'Unauthorized access to resume.');
     }
 
-    // Check private storage ('local' disk) first, then fallback to legacy public storage ('public' disk)
+    // Check configured resume disk first, then fallback to local private storage, then legacy public storage
     $disk = null;
-    if (Storage::disk('local')->exists($application->resume)) {
-        $disk = 'local';
-    } elseif (Storage::disk('public')->exists($application->resume)) {
-        $disk = 'public';
+    $configuredDisk = config('filesystems.resume_disk', 'local');
+    $candidateDisks = array_unique([$configuredDisk, 'local', 'public']);
+
+    foreach ($candidateDisks as $candidate) {
+        try {
+            if (Storage::disk($candidate)->exists($application->resume)) {
+                $disk = $candidate;
+                break;
+            }
+        } catch (\Throwable $e) {
+            Log::warning("Storage disk [{$candidate}] check error: " . $e->getMessage());
+        }
     }
 
     if (!$disk) {
@@ -251,7 +279,12 @@ public function downloadResume(Request $request, $id)
     // Safe sanitized download filename (does not expose internal physical storage path)
     $extension = pathinfo($application->resume, PATHINFO_EXTENSION) ?: 'pdf';
     $downloadName = 'Resume_Application_' . $application->id . '.' . $extension;
-    $mimeType = Storage::disk($disk)->mimeType($application->resume) ?? 'application/pdf';
+
+    try {
+        $mimeType = Storage::disk($disk)->mimeType($application->resume) ?? 'application/pdf';
+    } catch (\Throwable $e) {
+        $mimeType = 'application/pdf';
+    }
 
     if ($request->query('download') == '1') {
         return Storage::disk($disk)->download($application->resume, $downloadName);
