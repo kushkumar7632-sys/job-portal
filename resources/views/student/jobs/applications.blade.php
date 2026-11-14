@@ -1,76 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.student')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Applications | JobPortal</title>
+@section('title', 'My Applications')
+@section('header', 'My Applications')
+@section('subheader', 'Review the positions you have applied for and track application status')
 
-    @vite('resources/css/app.css')
-</head>
-
-@php
-    $studentName = session('student_name', 'Student');
-    $studentInitial = strtoupper(substr($studentName, 0, 1));
-@endphp
-
-<body class="min-h-screen flex flex-col bg-[#f4f6f8] text-[#202b38] antialiased">
-
-    <!-- HEADER -->
-    <header class="w-full border-b border-slate-200 bg-white">
-
-        <div class="flex h-[76px] items-center justify-between px-6 md:px-10 xl:px-14">
-
-            <a href="{{ route('student.jobs') }}" class="flex items-center gap-3">
-
-                <span class="flex h-10 w-10 items-center justify-center rounded-md bg-[#24496b] text-lg font-bold text-white">
-                    J
-                </span>
-
-                <span class="text-xl font-semibold tracking-tight text-[#172b40]">
-                    JobPortal
-                </span>
-
-            </a>
-
-
-            <div class="flex items-center gap-4 md:gap-6">
-
-                <div class="hidden text-right sm:block">
-
-                    <p class="text-[11px] font-medium uppercase tracking-wider text-slate-400">
-                        Signed in as
-                    </p>
-
-                    <p class="mt-1 text-sm font-semibold text-slate-800">
-                        {{ $studentName }}
-                    </p>
-
-                </div>
-
-
-                <div class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-slate-100 font-semibold text-[#294765]">
-                    {{ $studentInitial }}
-                </div>
-
-
-                <a href="{{ route('student.dashboard') }}"
-                   class="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
-
-                    Dashboard
-
-                </a>
-
-            </div>
-
-        </div>
-
-    </header>
-
-
-    <!-- MAIN CONTENT -->
-    <main class="w-full flex-1 px-5 py-8 md:px-10 xl:px-14 xl:py-10">
-
+@section('content')
 
         <!-- PAGE HEADING -->
         <section class="mb-8 flex flex-col justify-between gap-5 border-b border-slate-200 pb-8 md:flex-row md:items-end">
@@ -328,6 +262,14 @@
 
                                             </span>
 
+                                            <a href="{{ route('applications.resume.download', $application->id) }}"
+                                               target="_blank"
+                                               class="font-semibold text-[#315f86] transition hover:text-[#193d5e]">
+
+                                                View Resume →
+
+                                            </a>
+
                                         @else
 
                                             <a href="{{ route('student.resume.upload', $application->job_id) }}"
@@ -449,25 +391,4 @@
 
         @endif
 
-    </main>
-
-
-    <!-- FOOTER -->
-    <footer class="w-full border-t border-slate-200 bg-white">
-
-        <div class="flex flex-col justify-between gap-3 px-6 py-6 text-xs text-slate-400 sm:flex-row sm:items-center md:px-10 xl:px-14">
-
-            <p>
-                &copy; {{ date('Y') }} JobPortal. All rights reserved.
-            </p>
-
-            <p>
-                Student Workspace
-            </p>
-
-        </div>
-
-    </footer>
-
-</body>
-</html>
+@endsection

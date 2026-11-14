@@ -6,11 +6,8 @@
 
     <title>JobPortal | Welcome</title>
     <link rel="icon" type="image/svg+xml"
-      href="{{ asset('jobportal.svg') }}?v=3">
+      href="{{ asset('jobportal.svg') }}?v=4">
 
-<link rel="shortcut icon"
-      type="image/svg+xml"
-      href="{{ asset('jobportal.svg') }}?v=3">
     <style>
         * {
             margin: 0;

@@ -5,15 +5,52 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Job;
 use App\Models\Application;
+use App\Models\Student;
+use App\Models\Company;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class StudentJobController extends Controller
 {
-    // View all available jobs
-    public function index()
+    // View all available jobs with search, filtering, and pagination
+    public function index(Request $request)
     {
-        $jobs = Job::where('status', true)
-                   ->latest()
-                   ->get();
+        $query = Job::with('company')
+            ->where('status', true)
+            ->whereDate('deadline', '>=', now()->toDateString())
+            ->whereHas('company', function ($q) {
+                $q->where('is_approved', true);
+            });
+
+        // Keyword search by job title or description
+        if ($request->filled('search')) {
+            $search = trim($request->input('search'));
+            $query->where(function ($q) use ($search) {
+                $q->where('job_title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        // Job type filtering
+        if ($request->filled('job_type')) {
+            $jobType = trim($request->input('job_type'));
+            $query->where('job_type', $jobType);
+        }
+
+        // Location filtering
+        if ($request->filled('location')) {
+            $location = trim($request->input('location'));
+            $query->where('location', 'like', "%{$location}%");
+        }
+
+        // Experience filtering
+        if ($request->filled('experience')) {
+            $experience = trim($request->input('experience'));
+            $query->where('experience', 'like', "%{$experience}%");
+        }
+
+        $jobs = $query->latest()->paginate(9)->withQueryString();
 
         return view('student.jobs.index', compact('jobs'));
     }
@@ -22,46 +59,66 @@ class StudentJobController extends Controller
     // Job details
     public function show($id)
     {
-        $job = Job::where('status', true)
-                  ->findOrFail($id);
+        $today = now()->toDateString();
 
-        return view('student.jobs.show', compact('job'));
+        $job = Job::with('company')
+            ->where('status', true)
+            ->whereDate('deadline', '>=', $today)
+            ->whereHas('company', function ($query) {
+                $query->where('is_approved', true);
+            })
+            ->findOrFail($id);
+
+        $studentId = session('student_id');
+        $application = Application::where('student_id', $studentId)
+                                  ->where('job_id', $job->id)
+                                  ->first();
+
+        $alreadyApplied = !is_null($application);
+
+        return view('student.jobs.show', compact('job', 'alreadyApplied', 'application'));
     }
 
     public function apply($id)
-{
-    $studentId = session('student_id');
+    {
+        $studentId = session('student_id');
+        $today = now()->toDateString();
 
-    $job = Job::where('status', true)
-              ->findOrFail($id);
+        // Recheck job active status & company approval
+        $job = Job::where('status', true)
+            ->whereHas('company', function ($query) {
+                $query->where('is_approved', true);
+            })
+            ->findOrFail($id);
 
+        // Enforce backend deadline validation
+        if ($job->deadline < $today || \Carbon\Carbon::parse($job->deadline)->endOfDay()->isPast()) {
+            return redirect()
+                ->route('student.jobs')
+                ->with('error', 'This job posting has expired and is no longer accepting applications.');
+        }
 
-    // Check if already applied
+        // Check if already applied
+        $alreadyApplied = Application::where('student_id', $studentId)
+                                      ->where('job_id', $job->id)
+                                      ->exists();
 
-    $alreadyApplied = Application::where('student_id', $studentId)
-                                  ->where('job_id', $job->id)
-                                  ->exists();
+        if ($alreadyApplied) {
+            return redirect()
+                ->route('student.job.details', $job->id)
+                ->with('error', 'You have already applied for this job.');
+        }
 
-    if ($alreadyApplied) {
+        Application::create([
+            'student_id' => $studentId,
+            'job_id'     => $job->id,
+            'status'     => 'Pending',
+        ]);
 
         return redirect()
-            ->route('student.job.details', $job->id)
-            ->with('error', 'You have already applied for this job.');
-
+            ->route('student.resume.upload', $job->id)
+            ->with('success', 'Application submitted. Please upload your resume.');
     }
-
-
-    Application::create([
-        'student_id' => $studentId,
-        'job_id'     => $job->id,
-        'status'     => 'Pending',
-    ]);
-
-
-    return redirect()
-    ->route('student.resume.upload', $job->id)
-    ->with('success', 'Application submitted. Please upload your resume.');
-}
 // Show Resume Upload Page
 public function resumeUpload($id)
 {
@@ -85,25 +142,125 @@ public function uploadResume(Request $request, $id)
                               ->firstOrFail();
 
     $request->validate([
-        'resume' => 'required|mimes:pdf,doc,docx|max:2048',
+        'resume' => [
+            'required',
+            'file',
+            'mimes:pdf,doc,docx',
+            'mimetypes:application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'max:2048',
+        ],
+    ], [
+        'resume.required' => 'Please select a resume file to upload.',
+        'resume.file' => 'The uploaded resume must be a valid file.',
+        'resume.mimes' => 'The resume must be a file of type: PDF, DOC, or DOCX.',
+        'resume.mimetypes' => 'The uploaded file must be a valid PDF, DOC, or DOCX document.',
+        'resume.max' => 'The resume must not be larger than 2MB.',
     ]);
 
     if ($request->hasFile('resume')) {
-
         $file = $request->file('resume');
 
-        $filename = time() . '_' . $studentId . '.' . $file->getClientOriginalExtension();
+        // Randomized, unguessable filename stored outside public directory (storage/app/private/resumes)
+        $extension = $file->getClientOriginalExtension();
+        $filename = 'resume_' . Str::random(40) . '.' . $extension;
+        $newPath = 'resumes/' . $filename;
 
-        $file->storeAs('resumes', $filename, 'public');
+        // 1. Store the new file first in private storage ('local' disk)
+        $stored = $file->storeAs('resumes', $filename, 'local');
+        if (!$stored) {
+            return back()->with('error', 'Failed to store resume file. Please try again.');
+        }
 
-        $application->update([
-            'resume' => 'resumes/' . $filename,
-        ]);
+        $oldResume = $application->resume;
+
+        // 2. Update database record safely
+        try {
+            $application->update([
+                'resume' => $newPath,
+            ]);
+        } catch (\Throwable $e) {
+            // If database update fails, delete newly uploaded file and preserve old resume
+            Storage::disk('local')->delete($newPath);
+            throw $e;
+        }
+
+        // 3. Delete previous file only after replacement upload succeeds (only delete from private storage)
+        if ($oldResume && $oldResume !== $newPath) {
+            if (Storage::disk('local')->exists($oldResume)) {
+                Storage::disk('local')->delete($oldResume);
+            }
+        }
     }
 
     return redirect()
         ->route('student.job.details', $application->job_id)
         ->with('success', 'Resume uploaded successfully!');
+}
+
+/**
+ * Securely download or view an application resume with strict multi-role authorization.
+ */
+public function downloadResume(Request $request, $id)
+{
+    $application = Application::with('job.company')->findOrFail($id);
+
+    if (empty($application->resume)) {
+        abort(404, 'No resume document associated with this application.');
+    }
+
+    $isAuthorized = false;
+
+    // 1. Admin authorization: uses existing admin guard
+    if (Auth::guard('admin')->check()) {
+        $isAuthorized = true;
+    }
+
+    // 2. Student authorization: session exists, student record exists in DB, and owns the application
+    if (!$isAuthorized && session()->has('student_id')) {
+        $student = Student::find(session('student_id'));
+        if ($student && $student->id === $application->student_id) {
+            $isAuthorized = true;
+        }
+    }
+
+    // 3. Company authorization: session exists, company record exists in DB, is approved, and owns the job
+    if (!$isAuthorized && session()->has('company_id')) {
+        $company = Company::find(session('company_id'));
+        if ($company && $company->is_approved && $application->job && $application->job->company_id === $company->id) {
+            $isAuthorized = true;
+        }
+    }
+
+    // 4. Unauthorized requests return HTTP 403 Forbidden
+    if (!$isAuthorized) {
+        abort(403, 'Unauthorized access to resume.');
+    }
+
+    // Check private storage ('local' disk) first, then fallback to legacy public storage ('public' disk)
+    $disk = null;
+    if (Storage::disk('local')->exists($application->resume)) {
+        $disk = 'local';
+    } elseif (Storage::disk('public')->exists($application->resume)) {
+        $disk = 'public';
+    }
+
+    if (!$disk) {
+        abort(404, 'Resume file could not be found in storage.');
+    }
+
+    // Safe sanitized download filename (does not expose internal physical storage path)
+    $extension = pathinfo($application->resume, PATHINFO_EXTENSION) ?: 'pdf';
+    $downloadName = 'Resume_Application_' . $application->id . '.' . $extension;
+    $mimeType = Storage::disk($disk)->mimeType($application->resume) ?? 'application/pdf';
+
+    if ($request->query('download') == '1') {
+        return Storage::disk($disk)->download($application->resume, $downloadName);
+    }
+
+    return Storage::disk($disk)->response($application->resume, $downloadName, [
+        'Content-Type' => $mimeType,
+        'Content-Disposition' => 'inline; filename="' . $downloadName . '"',
+    ]);
 }
 
 // My Applications

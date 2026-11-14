@@ -1,209 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.student')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+@section('title', 'Find Jobs')
+@section('header', 'Find Jobs')
+@section('subheader', 'Discover opportunities for your career')
 
-    <title>Find Jobs | JobPortal</title>
-
-    @vite('resources/css/app.css')
-</head>
-
-@php
-    $studentName = session('student_name', 'Student');
-    $studentInitial = strtoupper(substr($studentName, 0, 1));
-@endphp
-
-<body class="min-h-screen bg-[#f5f7fa] text-slate-800 antialiased">
-
-<div class="flex min-h-screen">
-
-    <!-- SIDEBAR -->
-    <aside class="fixed inset-y-0 left-0 z-40 hidden w-[260px] flex-col bg-[#080d20] text-white lg:flex">
-
-        <!-- Logo -->
-        <div class="flex h-[84px] items-center border-b border-white/10 px-7">
-
-            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-[#5140ef] text-lg font-bold">
-                J
-            </div>
-
-            <span class="ml-3 text-xl font-semibold tracking-tight">
-                JobPortal
-            </span>
-
-        </div>
-
-
-        <!-- Navigation -->
-        <div class="flex-1 px-5 py-8">
-
-            <p class="mb-4 px-3 text-[11px] font-semibold uppercase tracking-[0.15em] text-slate-500">
-                Workspace
-            </p>
-
-
-            <nav class="space-y-2">
-
-                <!-- Dashboard -->
-                <a href="{{ route('student.dashboard') }}"
-                   class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-slate-400 transition hover:bg-white/5 hover:text-white">
-
-                    <svg class="h-5 w-5" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="1.7">
-
-                        <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1z"/>
-
-                    </svg>
-
-                    Dashboard
-
-                </a>
-
-
-                <!-- Find Jobs -->
-                <a href="{{ route('student.jobs') }}"
-                   class="flex items-center gap-3 rounded-lg bg-[#5140ef] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-950/20">
-
-                    <svg class="h-5 w-5" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="1.7">
-
-                        <circle cx="11" cy="11" r="7"/>
-                        <path d="m16 16 4 4"/>
-
-                    </svg>
-
-                    Find Jobs
-
-                </a>
-
-
-                <!-- My Applications -->
-                <a href="{{ url('/student/applications') }}"
-                   class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-slate-400 transition hover:bg-white/5 hover:text-white">
-
-                    <svg class="h-5 w-5" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="1.7">
-
-                        <rect x="5" y="3" width="14" height="18" rx="2"/>
-                        <path d="M9 8h6M9 12h6M9 16h4"/>
-
-                    </svg>
-
-                    My Applications
-
-                </a>
-
-            </nav>
-
-
-            <div class="my-7 border-t border-white/10"></div>
-
-
-            <p class="mb-4 px-3 text-[11px] font-semibold uppercase tracking-[0.15em] text-slate-500">
-                Account
-            </p>
-
-
-            <div class="rounded-lg px-4 py-3">
-
-                <div class="flex items-center gap-3">
-
-                    <div class="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-sm font-semibold text-slate-300">
-                        {{ $studentInitial }}
-                    </div>
-
-                    <div class="min-w-0">
-
-                        <p class="truncate text-sm font-semibold text-white">
-                            {{ $studentName }}
-                        </p>
-
-                        <p class="text-xs text-slate-500">
-                            Student Account
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- Sidebar Footer -->
-        <div class="border-t border-white/10 px-7 py-5">
-
-            <p class="text-xs text-slate-500">
-                JobPortal Student Workspace
-            </p>
-
-        </div>
-
-    </aside>
-
-
-
-    <!-- MAIN AREA -->
-    <div class="flex min-h-screen w-full flex-col lg:ml-[260px]">
-
-
-        <!-- TOP NAVBAR -->
-        <header class="sticky top-0 z-30 flex h-[76px] items-center justify-between border-b border-slate-200 bg-white px-5 sm:px-8 lg:px-10">
-
-            <div>
-
-                <h2 class="text-lg font-semibold text-[#172b40]">
-                    Find Jobs
-                </h2>
-
-                <p class="hidden text-xs text-slate-400 sm:block">
-                    Discover opportunities for your career
-                </p>
-
-            </div>
-
-
-            <div class="flex items-center gap-4">
-
-                <div class="hidden text-right sm:block">
-
-                    <p class="text-sm font-semibold text-slate-800">
-                        {{ $studentName }}
-                    </p>
-
-                    <p class="text-xs text-slate-400">
-                        Student
-                    </p>
-
-                </div>
-
-
-                <div class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-[#edf1ff] font-semibold text-[#5140ef]">
-
-                    {{ $studentInitial }}
-
-                </div>
-
-
-                <a href="{{ route('student.dashboard') }}"
-                   class="hidden rounded-md border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50 md:inline-flex">
-
-                    Dashboard
-
-                </a>
-
-            </div>
-
-        </header>
-
-
-
-        <!-- PAGE CONTENT -->
-        <main class="flex-1 px-5 py-8 sm:px-8 lg:px-10 lg:py-10">
-
+@section('content')
 
             <!-- PAGE HEADING -->
             <section class="mb-8 flex flex-col justify-between gap-5 md:flex-row md:items-end">
@@ -226,21 +27,174 @@
 
 
                 <!-- JOB COUNT -->
-                @if($jobs->count() > 0)
+                <div class="inline-flex items-center gap-3 self-start border border-slate-200 bg-white px-4 py-3">
 
-                    <div class="inline-flex items-center gap-3 self-start border border-slate-200 bg-white px-4 py-3">
+                    <span class="h-2 w-2 rounded-full {{ $jobs->total() > 0 ? 'bg-emerald-500' : 'bg-slate-400' }}"></span>
 
-                        <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+                    <span class="text-sm font-medium text-slate-600">
+                        @if($jobs->total() > 0)
+                            Showing {{ $jobs->firstItem() }} - {{ $jobs->lastItem() }} of {{ $jobs->total() }} Jobs
+                        @else
+                            0 Jobs Available
+                        @endif
+                    </span>
 
-                        <span class="text-sm font-medium text-slate-600">
+                </div>
 
-                            {{ $jobs->count() }} Jobs Available
+            </section>
 
-                        </span>
+
+            <!-- SEARCH & FILTER TOOLBAR -->
+            <section class="mb-8 border border-slate-200 bg-white p-5 sm:p-6 shadow-[0_2px_8px_rgba(15,23,42,0.04)]">
+
+                <form action="{{ route('student.jobs') }}" method="GET" class="space-y-4">
+
+                    <!-- PRIMARY ROW -->
+                    <div class="grid grid-cols-1 gap-4 lg:grid-cols-12">
+
+                        <!-- KEYWORD SEARCH -->
+                        <div class="lg:col-span-5">
+
+                            <label for="search" class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">
+                                Keywords
+                            </label>
+
+                            <div class="relative">
+
+                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="11" cy="11" r="7"/>
+                                        <path d="m16 16 4 4"/>
+                                    </svg>
+                                </div>
+
+                                <input
+                                    type="text"
+                                    id="search"
+                                    name="search"
+                                    value="{{ request('search') }}"
+                                    placeholder="Search by job title or description..."
+                                    class="w-full rounded-md border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-800 placeholder-slate-400 outline-none transition focus:border-[#5140ef] focus:ring-2 focus:ring-[#5140ef]/10">
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- JOB TYPE FILTER -->
+                        <div class="lg:col-span-3">
+
+                            <label for="job_type" class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">
+                                Job Type
+                            </label>
+
+                            <select
+                                id="job_type"
+                                name="job_type"
+                                class="w-full rounded-md border border-slate-300 bg-white py-2.5 pl-3.5 pr-8 text-sm text-slate-800 outline-none transition focus:border-[#5140ef] focus:ring-2 focus:ring-[#5140ef]/10">
+
+                                <option value="">All Job Types</option>
+                                <option value="Full Time" {{ request('job_type') === 'Full Time' ? 'selected' : '' }}>Full Time</option>
+                                <option value="Part Time" {{ request('job_type') === 'Part Time' ? 'selected' : '' }}>Part Time</option>
+                                <option value="Internship" {{ request('job_type') === 'Internship' ? 'selected' : '' }}>Internship</option>
+                                <option value="Contract" {{ request('job_type') === 'Contract' ? 'selected' : '' }}>Contract</option>
+                                <option value="Remote" {{ request('job_type') === 'Remote' ? 'selected' : '' }}>Remote</option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- LOCATION FILTER -->
+                        <div class="lg:col-span-4">
+
+                            <label for="location" class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">
+                                Location
+                            </label>
+
+                            <div class="relative">
+
+                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/>
+                                        <circle cx="12" cy="10" r="2.5"/>
+                                    </svg>
+                                </div>
+
+                                <input
+                                    type="text"
+                                    id="location"
+                                    name="location"
+                                    value="{{ request('location') }}"
+                                    placeholder="Filter by location (e.g. Pune)..."
+                                    class="w-full rounded-md border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-800 placeholder-slate-400 outline-none transition focus:border-[#5140ef] focus:ring-2 focus:ring-[#5140ef]/10">
+
+                            </div>
+
+                        </div>
 
                     </div>
 
-                @endif
+
+                    <!-- SECONDARY ROW -->
+                    <div class="grid grid-cols-1 gap-4 pt-1 sm:grid-cols-12 sm:items-end">
+
+                        <!-- EXPERIENCE FILTER -->
+                        <div class="sm:col-span-6 lg:col-span-5">
+
+                            <label for="experience" class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">
+                                Experience
+                            </label>
+
+                            <div class="relative">
+
+                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="9"/>
+                                        <path d="M12 7v5l3 2"/>
+                                    </svg>
+                                </div>
+
+                                <input
+                                    type="text"
+                                    id="experience"
+                                    name="experience"
+                                    value="{{ request('experience') }}"
+                                    placeholder="Filter by experience (e.g. 0-2 Years)..."
+                                    class="w-full rounded-md border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-800 placeholder-slate-400 outline-none transition focus:border-[#5140ef] focus:ring-2 focus:ring-[#5140ef]/10">
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ACTION BUTTONS -->
+                        <div class="flex flex-wrap items-center gap-3 sm:col-span-6 sm:justify-end lg:col-span-7">
+
+                            @if(request()->hasAny(['search', 'job_type', 'location', 'experience']) && (request('search') || request('job_type') || request('location') || request('experience')))
+                                <a href="{{ route('student.jobs') }}"
+                                   class="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-4 text-sm font-medium text-slate-600 transition hover:bg-slate-50 hover:text-slate-900">
+                                    <svg class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M18 6 6 18M6 6l12 12"/>
+                                    </svg>
+                                    Clear Filters
+                                </a>
+                            @endif
+
+                            <button
+                                type="submit"
+                                class="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-[#5140ef] px-6 text-sm font-semibold text-white shadow-sm transition hover:bg-[#4032d1] focus:outline-none focus:ring-2 focus:ring-[#5140ef] focus:ring-offset-2">
+                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>
+                                </svg>
+                                Filter
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </form>
 
             </section>
 
@@ -258,7 +212,7 @@
                         </h2>
 
                         <p class="text-xs text-slate-400">
-                            Latest opportunities
+                            Page {{ $jobs->currentPage() }} of {{ $jobs->lastPage() }}
                         </p>
 
                     </div>
@@ -299,8 +253,12 @@
 
                                                 </h3>
 
-                                                <p class="mt-1 text-xs text-slate-400">
-                                                    Job Opportunity
+                                                <!-- COMPANY NAME -->
+                                                <p class="mt-1 flex items-center gap-1.5 text-xs font-medium text-slate-600">
+                                                    <svg class="h-3.5 w-3.5 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                                        <path d="M3 21h18M3 7v14M21 7v14M6 11h4M6 15h4M14 11h4M14 15h4M9 21v-4h6v4M3 7l9-4 9 4"/>
+                                                    </svg>
+                                                    <span class="truncate">{{ $job->company->company_name ?? 'Company' }}</span>
                                                 </p>
 
                                             </div>
@@ -524,6 +482,12 @@
 
                     </div>
 
+
+                    <!-- PAGINATION LINKS -->
+                    <div class="mt-8">
+                        {{ $jobs->links() }}
+                    </div>
+
                 </section>
 
 
@@ -532,10 +496,10 @@
 
 
                 <!-- EMPTY STATE -->
-                <section class="flex min-h-[420px] flex-col items-center justify-center border border-slate-200 bg-white px-6 py-16 text-center">
+                <section class="flex min-h-[380px] flex-col items-center justify-center border border-slate-200 bg-white px-6 py-14 text-center">
 
 
-                    <div class="flex h-16 w-16 items-center justify-center border border-slate-200 bg-slate-50 text-slate-500">
+                    <div class="flex h-16 w-16 items-center justify-center border border-slate-200 bg-slate-50 text-slate-400">
 
                         <svg class="h-8 w-8"
                              viewBox="0 0 24 24"
@@ -543,30 +507,43 @@
                              stroke="currentColor"
                              stroke-width="1.5">
 
-                            <rect x="3" y="7" width="18" height="13" rx="1.5"/>
-                            <path d="M8 7V4h8v3M3 12h18"/>
+                            <circle cx="11" cy="11" r="7"/>
+                            <path d="m16 16 4 4"/>
 
                         </svg>
 
                     </div>
 
 
-                    <h2 class="mt-6 text-xl font-semibold text-[#172b40]">
-                        No Jobs Available
+                    <h2 class="mt-5 text-xl font-semibold text-[#172b40]">
+                        No Jobs Found
                     </h2>
 
 
                     <p class="mt-2 max-w-md text-sm leading-6 text-slate-500">
-                        There are currently no job openings available. Please check again later for new opportunities.
+                        @if(request()->hasAny(['search', 'job_type', 'location', 'experience']) && (request('search') || request('job_type') || request('location') || request('experience')))
+                            No jobs matched your current search and filter criteria. Try adjusting your search keywords or clearing filters.
+                        @else
+                            There are currently no active job openings available. Please check again later for new opportunities.
+                        @endif
                     </p>
 
 
-                    <a href="{{ route('student.dashboard') }}"
-                       class="mt-6 inline-flex h-10 items-center justify-center bg-[#5140ef] px-5 text-sm font-semibold text-white transition hover:bg-[#4032d1]">
+                    <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
 
-                        Back to Dashboard
+                        @if(request()->hasAny(['search', 'job_type', 'location', 'experience']) && (request('search') || request('job_type') || request('location') || request('experience')))
+                            <a href="{{ route('student.jobs') }}"
+                               class="inline-flex h-10 items-center justify-center gap-2 bg-[#5140ef] px-5 text-sm font-semibold text-white transition hover:bg-[#4032d1]">
+                                Clear Filters
+                            </a>
+                        @endif
 
-                    </a>
+                        <a href="{{ route('student.dashboard') }}"
+                           class="inline-flex h-10 items-center justify-center border border-slate-200 bg-white px-5 text-sm font-medium text-slate-600 transition hover:bg-slate-50">
+                            Back to Dashboard
+                        </a>
+
+                    </div>
 
 
                 </section>
@@ -575,88 +552,4 @@
             @endif
 
 
-        </main>
-
-
-
-        <!-- FOOTER -->
-        <footer class="border-t border-slate-200 bg-white px-5 py-5 sm:px-8 lg:px-10">
-
-            <div class="flex flex-col justify-between gap-2 text-xs text-slate-400 sm:flex-row sm:items-center">
-
-                <p>
-                    &copy; {{ date('Y') }} JobPortal. All rights reserved.
-                </p>
-
-                <p>
-                    Student Workspace
-                </p>
-
-            </div>
-
-        </footer>
-
-
-    </div>
-
-</div>
-
-
-<!-- MOBILE NAVIGATION -->
-<div class="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 bg-white lg:hidden">
-
-    <div class="grid grid-cols-3">
-
-        <a href="{{ route('student.dashboard') }}"
-           class="flex flex-col items-center gap-1 py-3 text-xs text-slate-500">
-
-            <svg class="h-5 w-5" viewBox="0 0 24 24"
-                 fill="none" stroke="currentColor" stroke-width="1.7">
-
-                <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1z"/>
-
-            </svg>
-
-            Dashboard
-
-        </a>
-
-
-        <a href="{{ route('student.jobs') }}"
-           class="flex flex-col items-center gap-1 border-t-2 border-[#5140ef] py-3 text-xs font-semibold text-[#5140ef]">
-
-            <svg class="h-5 w-5" viewBox="0 0 24 24"
-                 fill="none" stroke="currentColor" stroke-width="1.7">
-
-                <circle cx="11" cy="11" r="7"/>
-                <path d="m16 16 4 4"/>
-
-            </svg>
-
-            Find Jobs
-
-        </a>
-
-
-        <a href="{{ url('/student/applications') }}"
-           class="flex flex-col items-center gap-1 py-3 text-xs text-slate-500">
-
-            <svg class="h-5 w-5" viewBox="0 0 24 24"
-                 fill="none" stroke="currentColor" stroke-width="1.7">
-
-                <rect x="5" y="3" width="14" height="18" rx="2"/>
-                <path d="M9 8h6M9 12h6M9 16h4"/>
-
-            </svg>
-
-            Applications
-
-        </a>
-
-    </div>
-
-</div>
-
-
-</body>
-</html>
+@endsection

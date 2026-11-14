@@ -1,210 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.student')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+@section('title', 'Upload Resume')
+@section('header', 'Upload Resume')
+@section('subheader', 'Manage your career documents')
 
-    <title>Upload Resume | JobPortal</title>
+@section('content')
 
-    @vite('resources/css/app.css')
-</head>
 
-@php
-    $studentName = session('student_name', 'Student');
-    $studentInitial = strtoupper(substr($studentName, 0, 1));
-@endphp
 
-<body class="min-h-screen bg-[#f5f7fa] text-slate-800 antialiased">
 
-<div class="flex min-h-screen">
 
-    <!-- SIDEBAR -->
-    <aside class="fixed inset-y-0 left-0 z-40 hidden w-[260px] flex-col bg-[#080d20] text-white lg:flex">
 
-        <!-- LOGO -->
-        <div class="flex h-[84px] items-center border-b border-white/10 px-7">
-
-            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-[#5140ef] text-lg font-bold">
-                J
-            </div>
-
-            <span class="ml-3 text-xl font-semibold tracking-tight">
-                JobPortal
-            </span>
-
-        </div>
-
-
-        <!-- SIDEBAR NAVIGATION -->
-        <div class="flex-1 px-5 py-8">
-
-            <p class="mb-4 px-3 text-[11px] font-semibold uppercase tracking-[0.15em] text-slate-500">
-                Workspace
-            </p>
-
-
-            <nav class="space-y-2">
-
-                <!-- Dashboard -->
-                <a href="{{ route('student.dashboard') }}"
-                   class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-slate-400 transition hover:bg-white/5 hover:text-white">
-
-                    <svg class="h-5 w-5" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="1.7">
-
-                        <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1z"/>
-
-                    </svg>
-
-                    Dashboard
-
-                </a>
-
-
-                <!-- Find Jobs -->
-                <a href="{{ route('student.jobs') }}"
-                   class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-slate-400 transition hover:bg-white/5 hover:text-white">
-
-                    <svg class="h-5 w-5" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="1.7">
-
-                        <circle cx="11" cy="11" r="7"/>
-                        <path d="m16 16 4 4"/>
-
-                    </svg>
-
-                    Find Jobs
-
-                </a>
-
-
-                <!-- Applications -->
-                <a href="{{ url('/student/applications') }}"
-                   class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-slate-400 transition hover:bg-white/5 hover:text-white">
-
-                    <svg class="h-5 w-5" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="1.7">
-
-                        <rect x="5" y="3" width="14" height="18" rx="2"/>
-                        <path d="M9 8h6M9 12h6M9 16h4"/>
-
-                    </svg>
-
-                    My Applications
-
-                </a>
-
-            </nav>
-
-
-            <div class="my-7 border-t border-white/10"></div>
-
-
-            <p class="mb-4 px-3 text-[11px] font-semibold uppercase tracking-[0.15em] text-slate-500">
-                Account
-            </p>
-
-
-            <div class="rounded-lg px-4 py-3">
-
-                <div class="flex items-center gap-3">
-
-                    <div class="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-sm font-semibold text-slate-300">
-
-                        {{ $studentInitial }}
-
-                    </div>
-
-                    <div class="min-w-0">
-
-                        <p class="truncate text-sm font-semibold text-white">
-                            {{ $studentName }}
-                        </p>
-
-                        <p class="text-xs text-slate-500">
-                            Student Account
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- SIDEBAR FOOTER -->
-        <div class="border-t border-white/10 px-7 py-5">
-
-            <p class="text-xs text-slate-500">
-                JobPortal Student Workspace
-            </p>
-
-        </div>
-
-    </aside>
-
-
-
-    <!-- MAIN AREA -->
-    <div class="flex min-h-screen w-full flex-col lg:ml-[260px]">
-
-
-        <!-- TOP NAVBAR -->
-        <header class="sticky top-0 z-30 flex h-[76px] items-center justify-between border-b border-slate-200 bg-white px-5 sm:px-8 lg:px-10">
-
-            <div>
-
-                <h2 class="text-lg font-semibold text-[#172b40]">
-                    Upload Resume
-                </h2>
-
-                <p class="hidden text-xs text-slate-400 sm:block">
-                    Manage your career documents
-                </p>
-
-            </div>
-
-
-            <div class="flex items-center gap-4">
-
-                <div class="hidden text-right sm:block">
-
-                    <p class="text-sm font-semibold text-slate-800">
-                        {{ $studentName }}
-                    </p>
-
-                    <p class="text-xs text-slate-400">
-                        Student
-                    </p>
-
-                </div>
-
-
-                <div class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-[#edf1ff] font-semibold text-[#5140ef]">
-
-                    {{ $studentInitial }}
-
-                </div>
-
-
-                <a href="{{ route('student.dashboard') }}"
-                   class="hidden rounded-md border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50 md:inline-flex">
-
-                    Dashboard
-
-                </a>
-
-            </div>
-
-        </header>
-
-
-
-        <!-- PAGE CONTENT -->
-        <main class="flex-1 px-5 py-8 sm:px-8 lg:px-10 lg:py-10">
 
 
             <!-- BREADCRUMB -->
@@ -337,59 +143,11 @@
                     <div class="p-6 sm:p-8">
 
 
-                        <!-- SUCCESS MESSAGE -->
-                        @if(session('success'))
-
-                            <div class="mb-6 flex items-start gap-3 border border-green-200 bg-green-50 px-4 py-4 text-green-700">
-
-                                <svg class="mt-0.5 h-5 w-5 shrink-0"
-                                     viewBox="0 0 24 24"
-                                     fill="none"
-                                     stroke="currentColor"
-                                     stroke-width="2">
-
-                                    <path d="m5 12 4 4L19 6"/>
-
-                                </svg>
-
-                                <p class="text-sm font-medium">
-
-                                    {{ session('success') }}
-
-                                </p>
-
-                            </div>
-
-                        @endif
 
 
 
-                        <!-- VALIDATION ERRORS -->
-                        @if ($errors->any())
 
-                            <div class="mb-6 border border-red-200 bg-red-50 px-5 py-4 text-red-700">
 
-                                <p class="mb-2 text-sm font-semibold">
-
-                                    Please correct the following errors:
-
-                                </p>
-
-                                <ul class="list-inside list-disc space-y-1 text-sm">
-
-                                    @foreach ($errors->all() as $error)
-
-                                        <li>
-                                            {{ $error }}
-                                        </li>
-
-                                    @endforeach
-
-                                </ul>
-
-                            </div>
-
-                        @endif
 
 
 
@@ -770,131 +528,28 @@
 
             </div>
 
-        </main>
+@endsection
 
-
-
-        <!-- FOOTER -->
-        <footer class="border-t border-slate-200 bg-white px-5 py-5 sm:px-8 lg:px-10">
-
-            <div class="flex flex-col justify-between gap-2 text-xs text-slate-400 sm:flex-row sm:items-center">
-
-                <p>
-                    &copy; {{ date('Y') }} JobPortal. All rights reserved.
-                </p>
-
-                <p>
-                    Student Workspace
-                </p>
-
-            </div>
-
-        </footer>
-
-
-    </div>
-
-</div>
-
-
-
-<!-- MOBILE NAVIGATION -->
-<div class="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 bg-white lg:hidden">
-
-    <div class="grid grid-cols-3">
-
-
-        <a href="{{ route('student.dashboard') }}"
-           class="flex flex-col items-center gap-1 py-3 text-xs text-slate-500">
-
-            <svg class="h-5 w-5" viewBox="0 0 24 24"
-                 fill="none" stroke="currentColor" stroke-width="1.7">
-
-                <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1z"/>
-
-            </svg>
-
-            Dashboard
-
-        </a>
-
-
-        <a href="{{ route('student.jobs') }}"
-           class="flex flex-col items-center gap-1 py-3 text-xs text-slate-500">
-
-            <svg class="h-5 w-5" viewBox="0 0 24 24"
-                 fill="none" stroke="currentColor" stroke-width="1.7">
-
-                <circle cx="11" cy="11" r="7"/>
-                <path d="m16 16 4 4"/>
-
-            </svg>
-
-            Find Jobs
-
-        </a>
-
-
-        <a href="{{ url('/student/applications') }}"
-           class="flex flex-col items-center gap-1 py-3 text-xs text-slate-500">
-
-            <svg class="h-5 w-5" viewBox="0 0 24 24"
-                 fill="none" stroke="currentColor" stroke-width="1.7">
-
-                <rect x="5" y="3" width="14" height="18" rx="2"/>
-                <path d="M9 8h6M9 12h6M9 16h4"/>
-
-            </svg>
-
-            Applications
-
-        </a>
-
-
-    </div>
-
-</div>
-
-
-
-<!-- FILE NAME PREVIEW -->
+@push('scripts')
 <script>
-
     const resumeInput = document.getElementById('resume');
-
     const fileInfo = document.getElementById('fileInfo');
-
     const fileName = document.getElementById('fileName');
-
     const fileSize = document.getElementById('fileSize');
 
-
-    resumeInput.addEventListener('change', function () {
-
-        const file = this.files[0];
-
-        if (file) {
-
-            fileName.textContent = file.name;
-
-            fileSize.textContent = (file.size / 1024).toFixed(1) + ' KB';
-
-            fileInfo.classList.remove('hidden');
-
-            fileInfo.classList.add('flex');
-
-        } else {
-
-            fileInfo.classList.add('hidden');
-
-            fileInfo.classList.remove('flex');
-
-        }
-
-    });
-
+    if (resumeInput) {
+        resumeInput.addEventListener('change', function () {
+            const file = this.files[0];
+            if (file) {
+                fileName.textContent = file.name;
+                fileSize.textContent = (file.size / 1024).toFixed(1) + ' KB';
+                fileInfo.classList.remove('hidden');
+                fileInfo.classList.add('flex');
+            } else {
+                fileInfo.classList.add('hidden');
+                fileInfo.classList.remove('flex');
+            }
+        });
+    }
 </script>
-
-
-</body>
-</html>
+@endpush

@@ -125,4 +125,21 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Initial Administrator Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Used by AdminSeeder to bootstrap the initial system administrator
+    | account when the database has zero admin records. These values
+    | are mapped from environment variables for config-cache compatibility.
+    |
+    */
+
+    'initial_admin' => [
+        'name'     => env('INITIAL_ADMIN_NAME', 'System Administrator'),
+        'email'    => env('INITIAL_ADMIN_EMAIL'),
+        'password' => env('INITIAL_ADMIN_PASSWORD'),
+    ],
+
 ];

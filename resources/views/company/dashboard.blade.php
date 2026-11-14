@@ -1,728 +1,378 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.company')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/svg+xml"
-      href="{{ asset('jobportal.svg') }}?v=4">
+@section('title', 'Company Dashboard')
+@section('header', 'Employer Dashboard')
+@section('subheader', "Welcome back, " . session('company_name') . ". Here's your recruitment overview.")
 
-    <title>Company Dashboard</title>
+@section('content')
+<div class="space-y-8">
 
-    @vite('resources/css/app.css')
-</head>
+    <!-- Overview Bar & Action -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <p class="text-xs font-semibold uppercase tracking-wider text-blue-600 mb-1">
+                Recruitment Overview
+            </p>
+            <h2 class="text-2xl font-bold tracking-tight text-slate-900">
+                Performance & Candidate Pipeline
+            </h2>
+        </div>
 
-<body class="bg-[#f7f8fa] text-slate-800 antialiased">
+        <a href="{{ route('company.job.create') }}"
+           class="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-lg shadow-sm transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Post a New Job
+        </a>
+    </div>
 
-    <div class="min-h-screen flex">
+    <!-- Core Statistics Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
 
-        <!-- Sidebar -->
-        <aside class="hidden lg:flex w-[250px] bg-[#111827] text-white flex-col shrink-0">
-
-            <!-- Logo -->
-            <div class="h-20 px-7 flex items-center border-b border-white/10">
-
-                <a href="/company/dashboard"
-                   class="text-2xl font-bold tracking-tight">
-
-                    Job<span class="text-blue-400">Portal</span>
-
-                </a>
-
+        <!-- Total Jobs -->
+        <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-xs hover:border-slate-300 transition">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        Total Job Postings
+                    </p>
+                    <h3 class="text-3xl font-bold text-slate-900 mt-3">
+                        {{ $totalJobs }}
+                    </h3>
+                    <p class="text-xs text-slate-400 mt-1.5">
+                        Jobs created by your company
+                    </p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <rect x="3" y="7" width="18" height="14" rx="2" stroke-width="1.8"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 7V4h8v3M3 12h18"/>
+                    </svg>
+                </div>
             </div>
+        </div>
 
-
-            <!-- Navigation -->
-            <div class="px-4 py-8 flex-1">
-
-                <p class="px-3 text-[11px] font-semibold
-                          uppercase tracking-[0.15em]
-                          text-slate-500 mb-4">
-
-                    Workspace
-
-                </p>
-
-
-                <nav class="space-y-1">
-
-                    <a href="/company/dashboard"
-                       class="flex items-center gap-3 px-3 py-3
-                              rounded-lg bg-blue-600 text-white
-                              text-sm font-medium">
-
-                        <svg class="w-5 h-5" fill="none"
-                             stroke="currentColor" viewBox="0 0 24 24">
-                            <rect x="3" y="3" width="7" height="7" rx="1"/>
-                            <rect x="14" y="3" width="7" height="7" rx="1"/>
-                            <rect x="14" y="14" width="7" height="7" rx="1"/>
-                            <rect x="3" y="14" width="7" height="7" rx="1"/>
-                        </svg>
-
-                        Dashboard
-
-                    </a>
-
-
-                    <a href="/company/job/create"
-                       class="sidebar-link">
-
-                        <svg class="w-5 h-5" fill="none"
-                             stroke="currentColor" viewBox="0 0 24 24">
-                            <rect x="3" y="7" width="18" height="14" rx="2"/>
-                            <path d="M8 7V4h8v3M3 12h18M10 12v2h4v-2"/>
-                        </svg>
-
-                        Post a Job
-
-                    </a>
-
-
-                    <a href="{{ route('company.jobs') }}"
-                       class="sidebar-link">
-
-                        <svg class="w-5 h-5" fill="none"
-                             stroke="currentColor" viewBox="0 0 24 24">
-                            <path d="M4 5h16M4 10h16M4 15h10M4 20h10"/>
-                        </svg>
-
-                        Manage Jobs
-
-                    </a>
-
-
-                    <a href="#"
-                       class="sidebar-link">
-
-                        <svg class="w-5 h-5" fill="none"
-                             stroke="currentColor" viewBox="0 0 24 24">
-                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                            <circle cx="9" cy="7" r="4"/>
-                            <path d="M20 8v6M23 11h-6"/>
-                        </svg>
-
-                        Applications
-
-                    </a>
-
-
-                    <a href="{{ route('company.profile') }}"
-                       class="sidebar-link">
-
-                        <svg class="w-5 h-5" fill="none"
-                             stroke="currentColor" viewBox="0 0 24 24">
-                            <rect x="3" y="4" width="18" height="16" rx="2"/>
-                            <circle cx="9" cy="10" r="2"/>
-                            <path d="M6 16c0-2 1.5-3 3-3s3 1 3 3M15 9h3M15 13h3"/>
-                        </svg>
-
-                        Company Profile
-
-                    </a>
-
-                </nav>
-
-
-                <!-- Account Section -->
-                <div class="mt-10">
-
-                    <p class="px-3 text-[11px] font-semibold
-                              uppercase tracking-[0.15em]
-                              text-slate-500 mb-4">
-
-                        Account
-
+        <!-- Total Applications -->
+        <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-xs hover:border-slate-300 transition">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        Total Applications
                     </p>
-
-                    <form action="/company/logout" method="POST">
-
-                        @csrf
-
-                        <button type="submit"
-                                class="sidebar-link w-full text-left">
-
-                            <svg class="w-5 h-5" fill="none"
-                                 stroke="currentColor" viewBox="0 0 24 24">
-                                <path d="M10 17l5-5-5-5M15 12H3"/>
-                                <path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/>
-                            </svg>
-
-                            Sign out
-
-                        </button>
-
-                    </form>
-
+                    <h3 class="text-3xl font-bold text-slate-900 mt-3">
+                        {{ $totalApplications }}
+                    </h3>
+                    <p class="text-xs text-slate-400 mt-1.5">
+                        Candidate applications received
+                    </p>
                 </div>
-
+                <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4" stroke-width="1.8"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                </div>
             </div>
+        </div>
 
-
-            <!-- Sidebar Footer -->
-            <div class="p-5 border-t border-white/10">
-
-                <p class="text-xs text-slate-500">
-                    © {{ date('Y') }} JobPortal
-                </p>
-
-                <p class="text-xs text-slate-400 mt-1">
-                    Employer Workspace
-                </p>
-
-            </div>
-
-        </aside>
-
-
-
-        <!-- Main Content -->
-        <div class="flex-1 min-w-0">
-
-
-            <!-- Top Navbar -->
-            <header class="h-20 bg-white border-b border-slate-200
-                           px-5 sm:px-8 flex items-center
-                           justify-between sticky top-0 z-40">
-
-                <!-- Mobile Logo -->
-                <a href="/company/dashboard"
-                   class="lg:hidden text-xl font-bold">
-
-                    Job<span class="text-blue-600">Portal</span>
-
-                </a>
-
-
-                <div class="hidden lg:block">
-
-                    <p class="text-sm font-medium text-slate-800">
-                        Employer Workspace
+        <!-- Company Verification Status -->
+        <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-xs hover:border-slate-300 transition">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        Verification Status
                     </p>
-
-                    <p class="text-xs text-slate-400 mt-1">
-                        Manage your recruitment activities
-                    </p>
-
-                </div>
-
-
-                <!-- Account Info -->
-                <div class="flex items-center gap-3 sm:gap-4">
-
-                    <div class="hidden sm:block text-right">
-
-                        <p class="text-sm font-semibold text-slate-800">
-                            {{ session('company_name') }}
-                        </p>
-
-                        <p class="text-xs text-slate-400 mt-1">
-                            Company Account
-                        </p>
-
-                    </div>
-
-
-                    <div class="w-10 h-10 rounded-full
-                                bg-blue-50 border border-blue-100
-                                flex items-center justify-center
-                                text-blue-700 font-semibold">
-
-                        {{ strtoupper(substr(session('company_name'), 0, 1)) }}
-
-                    </div>
-
-
-                    <!-- Mobile Logout -->
-                    <form action="/company/logout" method="POST"
-                          class="lg:hidden">
-
-                        @csrf
-
-                        <button type="submit"
-                                class="text-sm font-medium text-red-600
-                                       border border-red-200 rounded-lg
-                                       px-3 py-2">
-
-                            Logout
-
-                        </button>
-
-                    </form>
-
-                </div>
-
-            </header>
-
-
-
-            <!-- Dashboard Body -->
-            <main class="max-w-[1500px] mx-auto px-5 sm:px-8 py-9">
-
-
-                <!-- Page Heading -->
-                <div class="flex flex-col sm:flex-row
-                            sm:items-center sm:justify-between gap-5 mb-9">
-
-                    <div>
-
-                        <p class="text-xs font-semibold
-                                  uppercase tracking-[0.15em]
-                                  text-blue-600 mb-3">
-
-                            OVERVIEW
-
-                        </p>
-
-                        <h1 class="text-2xl sm:text-3xl
-                                   font-semibold tracking-tight
-                                   text-slate-900">
-
-                            Dashboard
-
-                        </h1>
-
-                        <p class="text-sm text-slate-500 mt-2">
-
-                            Welcome back, {{ session('company_name') }}.
-                            Here's your recruitment overview.
-
-                        </p>
-
-                    </div>
-
-
-                    <a href="/company/job/create"
-                       class="inline-flex items-center justify-center
-                              gap-2 bg-blue-600 hover:bg-blue-700
-                              text-white text-sm font-semibold
-                              px-5 py-3 rounded-lg transition">
-
-                        <svg class="w-4 h-4" fill="none"
-                             stroke="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 5v14M5 12h14"/>
+                    <h3 class="text-2xl font-bold text-emerald-600 mt-3 flex items-center gap-2">
+                        <span>Approved</span>
+                        <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                         </svg>
-
-                        Post a new job
-
-                    </a>
-
-                </div>
-
-
-
-                <!-- Statistics -->
-                <div class="grid grid-cols-1 sm:grid-cols-2
-                            xl:grid-cols-3 gap-5 mb-10">
-
-
-                    <!-- Total Jobs -->
-                    <div class="bg-white border border-slate-200
-                                rounded-xl p-6">
-
-                        <div class="flex items-start justify-between">
-
-                            <div>
-
-                                <p class="text-sm text-slate-500 font-medium">
-                                    Total job postings
-                                </p>
-
-                                <h2 class="text-3xl font-semibold
-                                           text-slate-900 mt-4">
-
-                                    {{ $totalJobs }}
-
-                                </h2>
-
-                                <p class="text-xs text-slate-400 mt-2">
-                                    Jobs created by your company
-                                </p>
-
-                            </div>
-
-
-                            <div class="w-11 h-11 rounded-lg
-                                        bg-blue-50 text-blue-600
-                                        flex items-center justify-center">
-
-                                <svg class="w-5 h-5" fill="none"
-                                     stroke="currentColor" viewBox="0 0 24 24">
-                                    <rect x="3" y="7" width="18" height="14" rx="2"/>
-                                    <path d="M8 7V4h8v3M3 12h18"/>
-                                </svg>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-
-                    <!-- Applications -->
-                    <div class="bg-white border border-slate-200
-                                rounded-xl p-6">
-
-                        <div class="flex items-start justify-between">
-
-                            <div>
-
-                                <p class="text-sm text-slate-500 font-medium">
-                                    Total applications
-                                </p>
-
-                                <h2 class="text-3xl font-semibold
-                                           text-slate-900 mt-4">
-
-                                    0
-
-                                </h2>
-
-                                <p class="text-xs text-slate-400 mt-2">
-                                    Candidate applications
-                                </p>
-
-                            </div>
-
-
-                            <div class="w-11 h-11 rounded-lg
-                                        bg-emerald-50 text-emerald-600
-                                        flex items-center justify-center">
-
-                                <svg class="w-5 h-5" fill="none"
-                                     stroke="currentColor" viewBox="0 0 24 24">
-                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                                    <circle cx="9" cy="7" r="4"/>
-                                    <path d="M20 8v6M23 11h-6"/>
-                                </svg>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-
-                    <!-- Company Status -->
-                    <div class="bg-white border border-slate-200
-                                rounded-xl p-6">
-
-                        <div class="flex items-start justify-between">
-
-                            <div>
-
-                                <p class="text-sm text-slate-500 font-medium">
-                                    Account status
-                                </p>
-
-                                <h2 class="text-xl font-semibold
-                                           text-emerald-600 mt-4">
-
-                                    Approved
-
-                                </h2>
-
-                                <p class="text-xs text-slate-400 mt-2">
-                                    Company verification status
-                                </p>
-
-                            </div>
-
-
-                            <div class="w-11 h-11 rounded-lg
-                                        bg-emerald-50 text-emerald-600
-                                        flex items-center justify-center">
-
-                                <svg class="w-5 h-5" fill="none"
-                                     stroke="currentColor" viewBox="0 0 24 24">
-                                    <path d="M5 12l4 4L19 6"/>
-                                    <circle cx="12" cy="12" r="10"/>
-                                </svg>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-
-                <!-- Quick Actions -->
-                <section class="mb-10">
-
-                    <div class="mb-6">
-
-                        <h2 class="text-lg font-semibold text-slate-900">
-                            Recruitment management
-                        </h2>
-
-                        <p class="text-sm text-slate-500 mt-1">
-                            Access the tools you need to manage hiring.
-                        </p>
-
-                    </div>
-
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2
-                                xl:grid-cols-4 gap-5">
-
-
-                        <!-- Post Job -->
-                        <a href="/company/job/create"
-                           class="action-card group">
-
-                            <div class="action-icon bg-blue-50 text-blue-600">
-
-                                <svg class="w-6 h-6" fill="none"
-                                     stroke="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 5v14M5 12h14"/>
-                                </svg>
-
-                            </div>
-
-                            <h3 class="font-semibold text-slate-900">
-                                Post a new job
-                            </h3>
-
-                            <p class="text-sm text-slate-500 mt-2 leading-6">
-                                Create and publish a new job opening.
-                            </p>
-
-                            <div class="mt-5 text-sm font-semibold text-blue-600
-                                        flex items-center gap-2">
-
-                                Create job
-
-                                <span class="transition group-hover:translate-x-1">
-                                    →
-                                </span>
-
-                            </div>
-
-                        </a>
-
-
-
-                        <!-- Manage Jobs -->
-                        <a href="{{ route('company.jobs') }}"
-                           class="action-card group">
-
-                            <div class="action-icon bg-violet-50 text-violet-600">
-
-                                <svg class="w-6 h-6" fill="none"
-                                     stroke="currentColor" viewBox="0 0 24 24">
-                                    <path d="M4 5h16M4 10h16M4 15h10M4 20h10"/>
-                                </svg>
-
-                            </div>
-
-                            <h3 class="font-semibold text-slate-900">
-                                Manage jobs
-                            </h3>
-
-                            <p class="text-sm text-slate-500 mt-2 leading-6">
-                                Review and manage your published jobs.
-                            </p>
-
-                            <div class="mt-5 text-sm font-semibold text-violet-600
-                                        flex items-center gap-2">
-
-                                View jobs
-
-                                <span class="transition group-hover:translate-x-1">
-                                    →
-                                </span>
-
-                            </div>
-
-                        </a>
-
-
-
-                        <!-- Applications -->
-                        <a href="#"
-                           class="action-card group">
-
-                            <div class="action-icon bg-emerald-50 text-emerald-600">
-
-                                <svg class="w-6 h-6" fill="none"
-                                     stroke="currentColor" viewBox="0 0 24 24">
-                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                                    <circle cx="9" cy="7" r="4"/>
-                                    <path d="M20 8v6M23 11h-6"/>
-                                </svg>
-
-                            </div>
-
-                            <h3 class="font-semibold text-slate-900">
-                                Applications
-                            </h3>
-
-                            <p class="text-sm text-slate-500 mt-2 leading-6">
-                                Review applications from candidates.
-                            </p>
-
-                            <div class="mt-5 text-sm font-semibold text-emerald-600
-                                        flex items-center gap-2">
-
-                                View applications
-
-                                <span class="transition group-hover:translate-x-1">
-                                    →
-                                </span>
-
-                            </div>
-
-                        </a>
-
-
-
-                        <!-- Profile -->
-                        <a href="{{ route('company.profile') }}"
-                           class="action-card group">
-
-                            <div class="action-icon bg-orange-50 text-orange-600">
-
-                                <svg class="w-6 h-6" fill="none"
-                                     stroke="currentColor" viewBox="0 0 24 24">
-                                    <rect x="3" y="4" width="18" height="16" rx="2"/>
-                                    <circle cx="9" cy="10" r="2"/>
-                                    <path d="M6 16c0-2 1.5-3 3-3s3 1 3 3M15 9h3"/>
-                                </svg>
-
-                            </div>
-
-                            <h3 class="font-semibold text-slate-900">
-                                Company profile
-                            </h3>
-
-                            <p class="text-sm text-slate-500 mt-2 leading-6">
-                                Update your organization information.
-                            </p>
-
-                            <div class="mt-5 text-sm font-semibold text-orange-600
-                                        flex items-center gap-2">
-
-                                View profile
-
-                                <span class="transition group-hover:translate-x-1">
-                                    →
-                                </span>
-
-                            </div>
-
-                        </a>
-
-                    </div>
-
-                </section>
-
-
-
-                <!-- Recruitment CTA -->
-                <section class="bg-white border border-slate-200
-                                rounded-xl p-6 sm:p-8">
-
-                    <div class="flex flex-col md:flex-row
-                                md:items-center md:justify-between gap-6">
-
-                        <div>
-
-                            <h2 class="text-lg font-semibold text-slate-900">
-                                Ready to grow your team?
-                            </h2>
-
-                            <p class="text-sm text-slate-500 mt-2">
-                                Publish your next job opening and connect
-                                with potential candidates.
-                            </p>
-
-                        </div>
-
-
-                        <a href="/company/job/create"
-                           class="inline-flex items-center justify-center
-                                  gap-2 bg-slate-900 hover:bg-slate-700
-                                  text-white text-sm font-semibold
-                                  px-6 py-3 rounded-lg transition">
-
-                            Create job posting
-
-                            <span>→</span>
-
-                        </a>
-
-                    </div>
-
-                </section>
-
-
-                <!-- Footer -->
-                <footer class="mt-12 pt-6 border-t border-slate-200">
-
-                    <p class="text-xs text-slate-400 text-center">
-                        © {{ date('Y') }} JobPortal. All rights reserved.
+                    </h3>
+                    <p class="text-xs text-slate-400 mt-1.5">
+                        Verified Employer Organization
                     </p>
-
-                </footer>
-
-
-            </main>
-
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                </div>
+            </div>
         </div>
 
     </div>
 
+    <!-- Application Status Breakdown -->
+    <div>
+        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">
+            Application Pipeline Stages
+        </p>
 
-    <!-- Custom Styles -->
-    <style>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
 
-        .sidebar-link {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            border-radius: 8px;
-            color: #9ca3af;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
+            <!-- Pending -->
+            <div class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-xs">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-amber-600">Pending</span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                </div>
+                <p class="text-3xl font-bold text-slate-900 mt-2">
+                    {{ $pendingApplications }}
+                </p>
+                <p class="text-xs text-slate-400 mt-1">Under initial review</p>
+            </div>
 
-        .sidebar-link:hover {
-            background: rgba(255, 255, 255, 0.07);
-            color: #ffffff;
-        }
+            <!-- Shortlisted -->
+            <div class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-xs">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-blue-600">Shortlisted</span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                </div>
+                <p class="text-3xl font-bold text-slate-900 mt-2">
+                    {{ $shortlistedApplications }}
+                </p>
+                <p class="text-xs text-slate-400 mt-1">Cleared for interviews</p>
+            </div>
 
-        .action-card {
-            display: block;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 24px;
-            transition: border-color 0.2s ease,
-                        transform 0.2s ease;
-        }
+            <!-- Selected -->
+            <div class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-xs">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-emerald-600">Selected</span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                </div>
+                <p class="text-3xl font-bold text-slate-900 mt-2">
+                    {{ $selectedApplications }}
+                </p>
+                <p class="text-xs text-slate-400 mt-1">Hired / Offered</p>
+            </div>
 
-        .action-card:hover {
-            border-color: #93c5fd;
-            transform: translateY(-3px);
-        }
+            <!-- Rejected -->
+            <div class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-xs">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-red-600">Rejected</span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                </div>
+                <p class="text-3xl font-bold text-slate-900 mt-2">
+                    {{ $rejectedApplications }}
+                </p>
+                <p class="text-xs text-slate-400 mt-1">Declined candidates</p>
+            </div>
 
-        .action-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
+        </div>
+    </div>
 
-    </style>
+    <!-- Quick Actions Grid -->
+    <div>
+        <div class="mb-4">
+            <h3 class="text-base font-bold text-slate-900">
+                Recruitment Quick Actions
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">
+                Quick access to common recruitment workflows and configurations
+            </p>
+        </div>
 
-</body>
-</html>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+            <!-- Post a Job -->
+            <a href="{{ route('company.job.create') }}"
+               class="group block bg-white border border-slate-200 hover:border-blue-300 hover:shadow-sm rounded-xl p-5 transition">
+                <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center mb-4 transition group-hover:bg-blue-600 group-hover:text-white">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                </div>
+                <h4 class="font-bold text-slate-900 text-sm">
+                    Post a New Job
+                </h4>
+                <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                    Create and publish a new job opening for applicants.
+                </p>
+                <div class="mt-4 text-xs font-semibold text-blue-600 flex items-center gap-1">
+                    Create Job <span class="transition group-hover:translate-x-1">&rarr;</span>
+                </div>
+            </a>
+
+            <!-- Manage Jobs -->
+            <a href="{{ route('company.jobs') }}"
+               class="group block bg-white border border-slate-200 hover:border-violet-300 hover:shadow-sm rounded-xl p-5 transition">
+                <div class="w-10 h-10 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center mb-4 transition group-hover:bg-violet-600 group-hover:text-white">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6h16M4 10h16M4 14h10M4 18h10"/>
+                    </svg>
+                </div>
+                <h4 class="font-bold text-slate-900 text-sm">
+                    Manage Jobs
+                </h4>
+                <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                    Review, edit, activate, or close your published jobs.
+                </p>
+                <div class="mt-4 text-xs font-semibold text-violet-600 flex items-center gap-1">
+                    View Listings <span class="transition group-hover:translate-x-1">&rarr;</span>
+                </div>
+            </a>
+
+            <!-- Applications -->
+            <a href="{{ route('company.applications') }}"
+               class="group block bg-white border border-slate-200 hover:border-emerald-300 hover:shadow-sm rounded-xl p-5 transition">
+                <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 transition group-hover:bg-emerald-600 group-hover:text-white">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4" stroke-width="1.8"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                </div>
+                <h4 class="font-bold text-slate-900 text-sm">
+                    Candidate Applications
+                </h4>
+                <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                    Review resumes and make candidate hiring decisions.
+                </p>
+                <div class="mt-4 text-xs font-semibold text-emerald-600 flex items-center gap-1">
+                    Review Applicants <span class="transition group-hover:translate-x-1">&rarr;</span>
+                </div>
+            </a>
+
+            <!-- Profile -->
+            <a href="{{ route('company.profile') }}"
+               class="group block bg-white border border-slate-200 hover:border-amber-300 hover:shadow-sm rounded-xl p-5 transition">
+                <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center mb-4 transition group-hover:bg-amber-600 group-hover:text-white">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <rect x="4" y="2" width="16" height="20" rx="2" stroke-width="1.8"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 22v-4h6v4M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01"/>
+                    </svg>
+                </div>
+                <h4 class="font-bold text-slate-900 text-sm">
+                    Company Profile
+                </h4>
+                <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                    Update organization identity, contacts, and password.
+                </p>
+                <div class="mt-4 text-xs font-semibold text-amber-600 flex items-center gap-1">
+                    Edit Profile <span class="transition group-hover:translate-x-1">&rarr;</span>
+                </div>
+            </a>
+
+        </div>
+    </div>
+
+    <!-- Recent Candidate Applications Table -->
+    <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between flex-wrap gap-4">
+            <div>
+                <h3 class="text-base font-bold text-slate-900">
+                    Recent Candidate Applications
+                </h3>
+                <p class="text-xs text-slate-400 mt-0.5">
+                    Latest candidates who applied to your open positions
+                </p>
+            </div>
+
+            <a href="{{ route('company.applications') }}"
+               class="text-xs font-semibold text-blue-600 hover:underline">
+                View All Applications &rarr;
+            </a>
+        </div>
+
+        @if($recentApplications->count() > 0)
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-100 text-xs font-bold uppercase tracking-wider text-slate-400">
+                            <th class="py-3 px-6">Candidate</th>
+                            <th class="py-3 px-6">Position</th>
+                            <th class="py-3 px-6">Applied</th>
+                            <th class="py-3 px-6">Status</th>
+                            <th class="py-3 px-6 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 text-sm">
+                        @foreach($recentApplications as $recent)
+                            <tr class="hover:bg-slate-50/70 transition">
+                                <td class="py-3.5 px-6">
+                                    <div class="font-semibold text-slate-900">
+                                        {{ $recent->student->name ?? 'Candidate' }}
+                                    </div>
+                                    <div class="text-xs text-slate-400">
+                                        {{ $recent->student->email ?? '' }}
+                                    </div>
+                                </td>
+                                <td class="py-3.5 px-6">
+                                    <span class="font-medium text-slate-800">
+                                        {{ $recent->job->job_title ?? 'Job Title' }}
+                                    </span>
+                                </td>
+                                <td class="py-3.5 px-6 text-xs text-slate-500">
+                                    {{ $recent->created_at ? $recent->created_at->diffForHumans() : '' }}
+                                </td>
+                                <td class="py-3.5 px-6">
+                                    @if($recent->status === 'Pending')
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                            Pending
+                                        </span>
+                                    @elseif($recent->status === 'Shortlisted')
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                                            Shortlisted
+                                        </span>
+                                    @elseif($recent->status === 'Selected')
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                            Selected
+                                        </span>
+                                    @elseif($recent->status === 'Rejected')
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-50 text-red-700 border border-red-200">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                                            Rejected
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="py-3.5 px-6 text-right">
+                                    <a href="{{ route('company.application.show', $recent->id) }}"
+                                       class="text-xs font-semibold text-blue-600 hover:underline">
+                                        Review &rarr;
+                                    </a>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @else
+            <div class="py-12 px-6 text-center">
+                <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4" stroke-width="1.8"/>
+                    </svg>
+                </div>
+                <p class="text-sm font-semibold text-slate-700">No applications received yet</p>
+                <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
+                    When candidates apply to your job postings, their details and resumes will appear here.
+                </p>
+            </div>
+        @endif
+    </div>
+
+    <!-- Recruitment CTA Card -->
+    <div class="bg-gradient-to-r from-slate-900 to-blue-950 rounded-2xl p-6 sm:p-8 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+            <h3 class="text-lg font-bold text-white">
+                Ready to expand your team?
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl">
+                Publish a new opening and reach thousands of qualified student and graduate candidates.
+            </p>
+        </div>
+
+        <a href="{{ route('company.job.create') }}"
+           class="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm px-6 py-3 rounded-xl shadow-md transition shrink-0">
+            Create Job Posting &rarr;
+        </a>
+    </div>
+
+</div>
+@endsection

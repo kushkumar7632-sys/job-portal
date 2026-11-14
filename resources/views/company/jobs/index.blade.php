@@ -1,725 +1,340 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.company')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+@section('title', 'Manage Jobs')
+@section('header', 'Manage Jobs')
+@section('subheader', 'Review, filter, and manage your active and closed job postings')
 
-    <title>Manage Jobs | JobPortal</title>
+@section('content')
+<div class="space-y-8">
 
-    @vite('resources/css/app.css')
+    <!-- Top Action Bar & Breadcrumbs -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <nav class="flex items-center gap-2 text-xs font-medium text-slate-400">
+            <a href="{{ route('company.dashboard') }}" class="hover:text-blue-600 transition">Dashboard</a>
+            <span>/</span>
+            <span class="text-blue-600 font-semibold">Manage Jobs</span>
+        </nav>
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+        <a href="{{ route('company.job.create') }}"
+           class="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-lg shadow-sm transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Post New Job
+        </a>
+    </div>
 
-        body {
-            font-family: Inter, sans-serif;
-        }
+    <!-- Statistics Cards -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
 
-        .hero-bg {
-            background: linear-gradient(115deg, #0f172a, #172554 60%, #1d4ed8);
-        }
-
-        .stat-card {
-            transition: all .25s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 25px rgba(15, 23, 42, .07);
-        }
-
-        .job-row {
-            transition: background .2s ease;
-        }
-
-        .job-row:hover {
-            background: #f8fbff;
-        }
-
-        .action-btn {
-            transition: all .2s ease;
-        }
-    </style>
-</head>
-
-<body class="bg-slate-50 text-slate-800 min-h-screen">
-
-    <!-- NAVBAR -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
-
-        <div class="w-full px-5 lg:px-10 xl:px-14 h-20
-                    flex items-center justify-between">
-
-            <!-- LOGO -->
-            <a href="{{ route('company.dashboard') }}"
-               class="flex items-center gap-3">
-
-                <div class="w-12 h-12 rounded-xl bg-blue-600
-                            flex items-center justify-center
-                            text-white text-2xl font-bold shadow-lg">
-                    J
-                </div>
-
+        <!-- Total Jobs -->
+        <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-xs hover:border-slate-300 transition">
+            <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-2xl font-bold text-slate-900">
-                        Job<span class="text-blue-600">Portal</span>
-                    </h1>
-
-                    <!-- <p class="text-xs text-slate-400 tracking-widest font-semibold">
-                        EMPLOYER PORTAL
-                    </p> -->
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        Total Jobs Posted
+                    </p>
+                    <h3 class="text-3xl font-bold text-slate-900 mt-3">
+                        {{ $totalJobs ?? $jobs->total() }}
+                    </h3>
+                    <p class="text-xs text-slate-400 mt-1.5">
+                        All company job openings
+                    </p>
                 </div>
-
-            </a>
-
-
-            <!-- NAV ACTION -->
-            <div class="flex items-center gap-3">
-
-                <span class="hidden md:block text-sm text-slate-500">
-                    Job Management
-                </span>
-
-                <a href="/company/job/create"
-                   class="inline-flex items-center gap-2
-                          bg-blue-600 hover:bg-blue-700
-                          text-white px-5 py-3 rounded-xl
-                          font-semibold text-sm transition shadow-sm">
-
-                    <svg class="w-5 h-5" fill="none"
-                         stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M12 5v14m-7-7h14"/>
+                <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6h16M4 10h16M4 14h10M4 18h10"/>
                     </svg>
-
-                    Post New Job
-
-                </a>
-
+                </div>
             </div>
-
         </div>
 
-    </header>
-
-
-    <!-- MAIN -->
-    <main class="w-full px-5 lg:px-10 xl:px-14 py-9">
-
-
-        <!-- PAGE HEADER -->
-        <section class="flex flex-col lg:flex-row
-                        lg:items-center lg:justify-between
-                        gap-5 mb-9">
-
-            <div>
-
-                <div class="flex items-center gap-2 text-sm mb-3">
-
-                    <a href="{{ route('company.dashboard') }}"
-                       class="text-slate-400 hover:text-blue-600">
-                        Dashboard
-                    </a>
-
-                    <span class="text-slate-300">/</span>
-
-                    <span class="text-blue-600 font-semibold">
-                        Manage Jobs
-                    </span>
-
-                </div>
-
-                <!-- <p class="text-xs font-bold tracking-widest
-                          text-blue-600 uppercase mb-2">
-                    Employer Workspace
-                </p> -->
-
-                <!-- <h2 class="text-3xl lg:text-4xl font-bold text-slate-900">
-                    Manage Jobs
-                </h2> -->
-
-                <p class="text-slate-500 mt-2">
-                    Track, manage and update your company's job listings.
-                </p>
-
-            </div>
-
-
-            <a href="/company/job/create"
-               class="inline-flex items-center justify-center gap-2
-                      bg-slate-900 hover:bg-blue-700
-                      text-white px-6 py-3.5 rounded-xl
-                      font-semibold transition">
-
-                <svg class="w-5 h-5" fill="none"
-                     stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M12 5v14m-7-7h14"/>
-                </svg>
-
-                Create New Job
-
-            </a>
-
-        </section>
-
-
-
-        <!-- SUCCESS MESSAGE -->
-        @if(session('success'))
-
-            <div class="mb-7 flex items-center gap-4
-                        bg-green-50 border border-green-200
-                        text-green-800 px-5 py-4 rounded-xl">
-
-                <div class="w-10 h-10 rounded-full bg-green-100
-                            flex items-center justify-center shrink-0">
-
-                    <svg class="w-5 h-5" fill="none"
-                         stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M5 13l4 4L19 7"/>
-                    </svg>
-
-                </div>
-
-                <p class="font-semibold text-sm">
-                    {{ session('success') }}
-                </p>
-
-            </div>
-
-        @endif
-
-
-
-        <!-- STATISTICS -->
-        <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 mb-9">
-
-
-            <!-- TOTAL JOBS -->
-            <div class="stat-card bg-white border border-slate-200
-                        rounded-2xl p-6">
-
-                <div class="flex items-center justify-between">
-
-                    <div>
-                        <p class="text-sm font-medium text-slate-500">
-                            Total Jobs Posted
-                        </p>
-
-                        <h3 class="text-4xl font-bold text-slate-900 mt-3">
-                            {{ $jobs->count() }}
-                        </h3>
-
-                        <p class="text-xs text-slate-400 mt-2">
-                            All company listings
-                        </p>
-                    </div>
-
-                    <div class="w-14 h-14 rounded-2xl bg-blue-50
-                                text-blue-600 flex items-center justify-center">
-
-                        <svg class="w-7 h-7" fill="none"
-                             stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="1.8"
-                                  d="M4 7h16M4 12h16M4 17h10"/>
-                        </svg>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- ACTIVE JOBS -->
-            <div class="stat-card bg-white border border-slate-200
-                        rounded-2xl p-6">
-
-                <div class="flex items-center justify-between">
-
-                    <div>
-                        <p class="text-sm font-medium text-slate-500">
-                            Active Listings
-                        </p>
-
-                        <h3 class="text-4xl font-bold text-emerald-600 mt-3">
-                            {{ $jobs->count() }}
-                        </h3>
-
-                        <p class="text-xs text-slate-400 mt-2">
-                            Currently listed jobs
-                        </p>
-                    </div>
-
-                    <div class="w-14 h-14 rounded-2xl bg-emerald-50
-                                text-emerald-600 flex items-center justify-center">
-
-                        <svg class="w-7 h-7" fill="none"
-                             stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="1.8"
-                                  d="M9 12l2 2 4-4m5-3v5a9 9 0 11-18 0V7l9-4 9 4z"/>
-                        </svg>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- VACANCIES -->
-            <div class="stat-card bg-white border border-slate-200
-                        rounded-2xl p-6">
-
-                <div class="flex items-center justify-between">
-
-                    <div>
-                        <p class="text-sm font-medium text-slate-500">
-                            Total Vacancies
-                        </p>
-
-                        <h3 class="text-4xl font-bold text-indigo-600 mt-3">
-                            {{ $jobs->sum('vacancy') }}
-                        </h3>
-
-                        <p class="text-xs text-slate-400 mt-2">
-                            Available positions
-                        </p>
-                    </div>
-
-                    <div class="w-14 h-14 rounded-2xl bg-indigo-50
-                                text-indigo-600 flex items-center justify-center">
-
-                        <svg class="w-7 h-7" fill="none"
-                             stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="1.8"
-                                  d="M16 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2m12-13a4 4 0 11-8 0 4 4 0 018 0zm2 4a4 4 0 014 4v2"/>
-                        </svg>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- JOB MANAGEMENT TABLE -->
-        <section class="bg-white border border-slate-200
-                        rounded-2xl overflow-hidden">
-
-
-            <!-- TABLE HEADER -->
-            <div class="px-6 lg:px-8 py-6
-                        border-b border-slate-200
-                        flex flex-col sm:flex-row
-                        sm:items-center sm:justify-between gap-4">
-
+        <!-- Active Jobs -->
+        <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-xs hover:border-slate-300 transition">
+            <div class="flex items-center justify-between">
                 <div>
-
-                    <h3 class="text-xl font-bold text-slate-900">
-                        Posted Jobs
-                    </h3>
-
-                    <p class="text-sm text-slate-400 mt-1">
-                        Manage all your published job opportunities.
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        Active Listings
                     </p>
-
+                    <h3 class="text-3xl font-bold text-emerald-600 mt-3">
+                        {{ $activeJobs ?? $jobs->where('status', true)->count() }}
+                    </h3>
+                    <p class="text-xs text-slate-400 mt-1.5">
+                        Accepting candidate applications
+                    </p>
                 </div>
-
-
-                <div class="inline-flex items-center gap-2
-                            bg-blue-50 text-blue-700
-                            border border-blue-100
-                            px-4 py-2 rounded-lg text-sm font-semibold">
-
-                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-
-                    {{ $jobs->count() }} Total Jobs
-
+                <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5-3v5a9 9 0 11-18 0V7l9-4 9 4z"/>
+                    </svg>
                 </div>
+            </div>
+        </div>
 
+        <!-- Total Vacancies -->
+        <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-xs hover:border-slate-300 transition">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        Total Vacancies
+                    </p>
+                    <h3 class="text-3xl font-bold text-indigo-600 mt-3">
+                        {{ $totalVacancies ?? $jobs->sum('vacancy') }}
+                    </h3>
+                    <p class="text-xs text-slate-400 mt-1.5">
+                        Available positions across listings
+                    </p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2m12-13a4 4 0 11-8 0 4 4 0 018 0zm2 4a4 4 0 014 4v2"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- Jobs Table & Filters -->
+    <section class="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden">
+
+        <!-- Header Toolbar -->
+        <div class="px-6 py-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <h3 class="text-lg font-bold text-slate-900">
+                    Posted Job Listings
+                </h3>
+                <p class="text-xs text-slate-400 mt-0.5">
+                    Filter and manage your recruitment pipeline
+                </p>
             </div>
 
+            <!-- Search Form -->
+            <form action="{{ route('company.jobs') }}" method="GET" class="flex items-center gap-2 flex-wrap">
+                <div class="relative">
+                    <input type="text"
+                           name="search"
+                           value="{{ request('search') }}"
+                           placeholder="Search job title or location..."
+                           class="pl-9 pr-3 py-2 text-xs rounded-lg border border-slate-300 bg-white text-slate-800 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100 w-56 sm:w-64">
+                    <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="7" stroke-width="1.8"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m16 16 4 4"/>
+                    </svg>
+                </div>
 
+                <button type="submit"
+                        class="text-xs bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-lg font-semibold transition">
+                    Search
+                </button>
 
-            <!-- TABLE -->
-            <div class="overflow-x-auto">
+                @if(request('search'))
+                    <a href="{{ route('company.jobs') }}"
+                       class="text-xs text-slate-500 hover:text-slate-800 py-2 px-1 font-medium transition">
+                        Reset
+                    </a>
+                @endif
+            </form>
+        </div>
 
-                <table class="w-full min-w-[1000px]">
+        <!-- Table -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse min-w-[900px]">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-100 text-xs font-bold uppercase tracking-wider text-slate-500">
+                        <th class="py-4 px-6">Job Details</th>
+                        <th class="py-4 px-6">Location</th>
+                        <th class="py-4 px-6">Salary</th>
+                        <th class="py-4 px-6">Vacancies</th>
+                        <th class="py-4 px-6">Deadline</th>
+                        <th class="py-4 px-6 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-sm">
+                    @forelse($jobs as $job)
+                        <tr class="hover:bg-slate-50/70 transition">
 
-                    <thead class="bg-slate-50 border-b border-slate-200">
+                            <!-- Job Title & Badges -->
+                            <td class="py-4 px-6">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center text-sm font-bold shrink-0">
+                                        {{ strtoupper(substr($job->job_title, 0, 1)) }}
+                                    </div>
+                                    <div class="min-w-0">
+                                        <h4 class="font-bold text-slate-900 text-sm">
+                                            {{ $job->job_title }}
+                                        </h4>
+                                        <div class="flex items-center gap-2 mt-1 flex-wrap">
+                                            @if($job->status)
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                                    Active
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                                                    Closed
+                                                </span>
+                                            @endif
 
-                        <tr>
+                                            <span class="text-xs text-slate-400">&bull;</span>
 
-                            <th class="text-left px-7 py-5 text-xs
-                                       font-bold uppercase tracking-wider
-                                       text-slate-500">
-                                Job Details
-                            </th>
+                                            <span class="text-xs font-medium text-slate-500">
+                                                {{ $job->job_type }}
+                                            </span>
 
-                            <th class="text-left px-6 py-5 text-xs
-                                       font-bold uppercase tracking-wider
-                                       text-slate-500">
-                                Location
-                            </th>
+                                            <span class="text-xs text-slate-400">&bull;</span>
 
-                            <th class="text-left px-6 py-5 text-xs
-                                       font-bold uppercase tracking-wider
-                                       text-slate-500">
-                                Salary
-                            </th>
+                                            <a href="{{ route('company.job.applications', $job->id) }}"
+                                               class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition">
+                                                {{ $job->applications_count ?? $job->applications()->count() }} Applicants
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
 
-                            <th class="text-left px-6 py-5 text-xs
-                                       font-bold uppercase tracking-wider
-                                       text-slate-500">
-                                Vacancies
-                            </th>
+                            <!-- Location -->
+                            <td class="py-4 px-6">
+                                <div class="flex items-center gap-1.5 text-slate-600 text-xs">
+                                    <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1116 0z"/>
+                                        <circle cx="12" cy="10" r="2.5" stroke-width="1.8"/>
+                                    </svg>
+                                    <span>{{ $job->location }}</span>
+                                </div>
+                            </td>
 
-                            <th class="text-left px-6 py-5 text-xs
-                                       font-bold uppercase tracking-wider
-                                       text-slate-500">
-                                Deadline
-                            </th>
+                            <!-- Salary -->
+                            <td class="py-4 px-6">
+                                <span class="text-xs font-semibold text-slate-800">
+                                    {{ $job->salary }}
+                                </span>
+                            </td>
 
-                            <th class="text-right px-7 py-5 text-xs
-                                       font-bold uppercase tracking-wider
-                                       text-slate-500">
-                                Actions
-                            </th>
+                            <!-- Vacancy -->
+                            <td class="py-4 px-6">
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-700">
+                                    {{ $job->vacancy }} Openings
+                                </span>
+                            </td>
+
+                            <!-- Deadline -->
+                            <td class="py-4 px-6 text-xs text-slate-500 font-medium">
+                                {{ $job->deadline }}
+                            </td>
+
+                            <!-- Actions -->
+                            <td class="py-4 px-6 text-right">
+                                <div class="flex justify-end items-center gap-2">
+
+                                    <!-- View Applicants -->
+                                    <a href="{{ route('company.job.applications', $job->id) }}"
+                                       title="View Job Applicants"
+                                       class="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-blue-100 transition">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2m12-13a4 4 0 11-8 0 4 4 0 018 0zm2 4a4 4 0 014 4v2"/>
+                                        </svg>
+                                        Applicants
+                                    </a>
+
+                                    <!-- Edit -->
+                                    <a href="{{ route('job.edit', $job->id) }}"
+                                       title="Edit Job"
+                                       class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-amber-100 transition">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16.862 4.487l1.687-1.688a2.121 2.121 0 013 3l-1.688 1.688M16.862 4.487L7.5 13.85l-1 4 4-1 9.362-9.363"/>
+                                        </svg>
+                                        Edit
+                                    </a>
+
+                                    <!-- Delete -->
+                                    <form action="{{ route('job.delete', $job->id) }}"
+                                          method="POST"
+                                          onsubmit="return confirm('Are you sure you want to delete this job posting? All associated applications will also be affected.')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                                title="Delete Job"
+                                                class="inline-flex items-center gap-1.5 bg-red-50 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-red-100 transition">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 7h16m-10 4v6m4-6v6M5 7l1 14h12l1-14M9 7V4h6v3"/>
+                                            </svg>
+                                            Delete
+                                        </button>
+                                    </form>
+
+                                </div>
+                            </td>
 
                         </tr>
-
-                    </thead>
-
-
-
-                    <tbody class="divide-y divide-slate-100">
-
-
-                        @forelse($jobs as $job)
-
-                            <tr class="job-row">
-
-
-                                <!-- JOB TITLE -->
-                                <td class="px-7 py-6">
-
-                                    <div class="flex items-center gap-4">
-
-                                        <div class="w-12 h-12 rounded-xl
-                                                    bg-blue-50 text-blue-700
-                                                    flex items-center justify-center
-                                                    text-lg font-bold shrink-0">
-
-                                            {{ strtoupper(substr($job->job_title, 0, 1)) }}
-
-                                        </div>
-
-                                        <div>
-
-                                            <h4 class="font-bold text-slate-900 text-base">
-                                                {{ $job->job_title }}
-                                            </h4>
-
-                                            <p class="text-xs text-slate-400 mt-1">
-                                                Job Opening
-                                            </p>
-
-                                        </div>
-
-                                    </div>
-
-                                </td>
-
-
-
-                                <!-- LOCATION -->
-                                <td class="px-6 py-6">
-
-                                    <div class="flex items-center gap-2 text-slate-600">
-
-                                        <svg class="w-4 h-4 text-blue-500 shrink-0"
-                                             fill="none" stroke="currentColor"
-                                             viewBox="0 0 24 24">
-
-                                            <path stroke-linecap="round"
-                                                  stroke-linejoin="round"
-                                                  stroke-width="1.8"
-                                                  d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1116 0z"/>
-
-                                            <circle cx="12" cy="10" r="2.5"
-                                                    stroke-width="1.8"/>
-
-                                        </svg>
-
-                                        <span class="text-sm font-medium">
-                                            {{ $job->location }}
-                                        </span>
-
-                                    </div>
-
-                                </td>
-
-
-
-                                <!-- SALARY -->
-                                <td class="px-6 py-6">
-
-                                    <span class="text-sm font-bold text-slate-800">
-                                        {{ $job->salary }}
-                                    </span>
-
-                                </td>
-
-
-
-                                <!-- VACANCY -->
-                                <td class="px-6 py-6">
-
-                                    <span class="inline-flex items-center
-                                                 bg-blue-50 text-blue-700
-                                                 border border-blue-100
-                                                 px-3 py-2 rounded-lg
-                                                 text-xs font-bold">
-
-                                        {{ $job->vacancy }} Openings
-
-                                    </span>
-
-                                </td>
-
-
-
-                                <!-- DEADLINE -->
-                                <td class="px-6 py-6">
-
-                                    <span class="text-sm text-slate-600 font-medium">
-                                        {{ $job->deadline }}
-                                    </span>
-
-                                </td>
-
-
-
-                                <!-- ACTIONS -->
-                                <td class="px-7 py-6">
-
-                                    <div class="flex justify-end items-center gap-2">
-
-
-                                        <!-- EDIT -->
-                                        <a href="{{ route('job.edit', $job->id) }}"
-                                           class="action-btn inline-flex items-center
-                                                  gap-2 bg-amber-50 text-amber-700
-                                                  border border-amber-200
-                                                  px-4 py-2.5 rounded-lg
-                                                  text-sm font-semibold
-                                                  hover:bg-amber-100">
-
-                                            <svg class="w-4 h-4" fill="none"
-                                                 stroke="currentColor"
-                                                 viewBox="0 0 24 24">
-
-                                                <path stroke-linecap="round"
-                                                      stroke-linejoin="round"
-                                                      stroke-width="1.8"
-                                                      d="M16.862 4.487l1.687-1.688a2.121 2.121 0 013 3l-1.688 1.688M16.862 4.487L7.5 13.85l-1 4 4-1 9.362-9.363"/>
-
-                                            </svg>
-
-                                            Edit
-
+                    @empty
+                        <tr>
+                            <td colspan="6" class="px-6 py-16 text-center">
+                                <div class="w-16 h-16 mx-auto rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mb-4">
+                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7h16M4 12h16M4 17h10"/>
+                                    </svg>
+                                </div>
+                                <h4 class="text-base font-bold text-slate-800">
+                                    No Job Listings Found
+                                </h4>
+                                <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                                    @if(request('search'))
+                                        No jobs matched your search criteria. Try a different query or reset filters.
+                                    @else
+                                        You haven't posted any jobs yet. Create your first opening to start receiving applications.
+                                    @endif
+                                </p>
+                                <div class="mt-5">
+                                    @if(request('search'))
+                                        <a href="{{ route('company.jobs') }}"
+                                           class="inline-flex items-center gap-2 text-xs font-semibold text-blue-600 hover:underline">
+                                            Reset Search
                                         </a>
-
-
-
-                                        <!-- DELETE -->
-                                        <form action="{{ route('job.delete', $job->id) }}"
-                                              method="POST"
-                                              onsubmit="return confirm('Are you sure you want to delete this job?')">
-
-                                            @csrf
-                                            @method('DELETE')
-
-                                            <button type="submit"
-                                                    class="action-btn inline-flex items-center
-                                                           gap-2 bg-red-50 text-red-600
-                                                           border border-red-200
-                                                           px-4 py-2.5 rounded-lg
-                                                           text-sm font-semibold
-                                                           hover:bg-red-100">
-
-                                                <svg class="w-4 h-4" fill="none"
-                                                     stroke="currentColor"
-                                                     viewBox="0 0 24 24">
-
-                                                    <path stroke-linecap="round"
-                                                          stroke-linejoin="round"
-                                                          stroke-width="1.8"
-                                                          d="M4 7h16m-10 4v6m4-6v6M5 7l1 14h12l1-14M9 7V4h6v3"/>
-
-                                                </svg>
-
-                                                Delete
-
-                                            </button>
-
-                                        </form>
-
-                                    </div>
-
-                                </td>
-
-                            </tr>
-
-
-                        @empty
-
-
-                            <!-- EMPTY STATE -->
-                            <tr>
-
-                                <td colspan="6" class="px-6 py-20">
-
-                                    <div class="text-center max-w-lg mx-auto">
-
-                                        <div class="w-20 h-20 mx-auto rounded-2xl
-                                                    bg-slate-100 text-slate-400
-                                                    flex items-center justify-center">
-
-                                            <svg class="w-10 h-10" fill="none"
-                                                 stroke="currentColor"
-                                                 viewBox="0 0 24 24">
-
-                                                <path stroke-linecap="round"
-                                                      stroke-linejoin="round"
-                                                      stroke-width="1.5"
-                                                      d="M4 7h16M4 12h16M4 17h10"/>
-
-                                            </svg>
-
-                                        </div>
-
-                                        <h3 class="text-xl font-bold text-slate-900 mt-6">
-                                            No Jobs Found
-                                        </h3>
-
-                                        <p class="text-slate-500 text-sm mt-2 leading-6">
-                                            You haven't posted any job opportunities yet.
-                                            Create your first job listing to start hiring.
-                                        </p>
-
-                                        <a href="/company/job/create"
-                                           class="inline-flex items-center gap-2
-                                                  mt-7 bg-blue-600 hover:bg-blue-700
-                                                  text-white px-6 py-3 rounded-xl
-                                                  font-semibold transition">
-
-                                            <svg class="w-5 h-5" fill="none"
-                                                 stroke="currentColor"
-                                                 viewBox="0 0 24 24">
-                                                <path stroke-linecap="round"
-                                                      stroke-linejoin="round"
-                                                      stroke-width="2"
-                                                      d="M12 5v14m-7-7h14"/>
-                                            </svg>
-
-                                            Post Your First Job
-
+                                    @else
+                                        <a href="{{ route('company.job.create') }}"
+                                           class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition">
+                                            Post Your First Job &rarr;
                                         </a>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
 
-                                    </div>
-
-                                </td>
-
-                            </tr>
-
-
-                        @endforelse
-
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-
-
-            <!-- TABLE FOOTER -->
-            @if($jobs->count() > 0)
-
-                <div class="px-6 lg:px-8 py-5
-                            border-t border-slate-100
-                            flex flex-col sm:flex-row
-                            sm:items-center sm:justify-between gap-3">
-
-                    <p class="text-sm text-slate-500">
+        <!-- Pagination & Footer -->
+        @if($jobs->count() > 0)
+            <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/50">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs text-slate-500">
+                    <p>
                         Showing
-                        <span class="font-bold text-slate-800">
-                            {{ $jobs->count() }}
-                        </span>
+                        <span class="font-bold text-slate-800">{{ $jobs->firstItem() ?? 1 }}</span>
+                        to
+                        <span class="font-bold text-slate-800">{{ $jobs->lastItem() ?? $jobs->count() }}</span>
+                        of
+                        <span class="font-bold text-slate-800">{{ $jobs->total() }}</span>
                         job listings
                     </p>
 
-                    <a href="/company/job/create"
-                       class="text-sm text-blue-600 hover:text-blue-800
-                              font-semibold transition">
-
-                        Create Another Job
-
+                    <a href="{{ route('company.job.create') }}"
+                       class="text-blue-600 hover:underline font-semibold">
+                        Post Another Job &rarr;
                     </a>
-
                 </div>
 
-            @endif
+                @if($jobs->hasPages())
+                    <div class="mt-4 pt-4 border-t border-slate-200">
+                        {{ $jobs->links() }}
+                    </div>
+                @endif
+            </div>
+        @endif
 
-        </section>
+    </section>
 
-    </main>
-
-
-
-    <!-- FOOTER -->
-    <footer class="bg-white border-t border-slate-200 mt-12">
-
-        <div class="w-full px-5 lg:px-10 xl:px-14 py-7
-                    flex flex-col md:flex-row
-                    items-center justify-between gap-3">
-
-            <p class="text-sm text-slate-500">
-                © {{ date('Y') }} JobPortal. All rights reserved.
-            </p>
-
-            <p class="text-sm text-slate-400">
-                Employer Job Management
-            </p>
-
-        </div>
-
-    </footer>
-
-</body>
-</html>
+</div>
+@endsection

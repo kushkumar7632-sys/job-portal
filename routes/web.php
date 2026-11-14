@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\CompanyAuthController;
+use App\Http\Controllers\CompanyApplicantController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\StudentJobController;
 use App\Http\Controllers\Admin\AuthController;
@@ -25,7 +26,7 @@ Route::post('/student/login',[StudentController::class,'login'])->name('student.
 
 Route::get('/student/dashboard', [StudentController::class, 'dashboard'])->middleware('student')->name('student.dashboard');
 
-Route::get('/student/logout', [StudentController::class, 'logout'])->middleware('student')->name('student.logout');
+Route::post('/student/logout', [StudentController::class, 'logout'])->middleware('student')->name('student.logout');
 
 //company register
 // Route::get('/company/register', [CompanyAuthController::class, 'showRegister']);
@@ -67,15 +68,15 @@ Route::get('/student/logout', [StudentController::class, 'logout'])->middleware(
 
 
 //company register
-Route::get('/company/register', [CompanyAuthController::class, 'showRegister']);
-Route::post('/company/register', [CompanyAuthController::class, 'register']);
+Route::get('/company/register', [CompanyAuthController::class, 'showRegister'])->name('company.register');
+Route::post('/company/register', [CompanyAuthController::class, 'register'])->name('company.register.submit');
 
 // company login
-Route::get('/company/login', [CompanyAuthController::class, 'showLogin']);
-Route::post('/company/login', [CompanyAuthController::class, 'login']);
+Route::get('/company/login', [CompanyAuthController::class, 'showLogin'])->name('company.login');
+Route::post('/company/login', [CompanyAuthController::class, 'login'])->name('company.login.submit');
 
 //logout
-Route::post('/company/logout', [CompanyAuthController::class, 'logout']);
+Route::post('/company/logout', [CompanyAuthController::class, 'logout'])->name('company.logout');
 
 
 Route::middleware('company.auth')->group(function () {
@@ -88,11 +89,19 @@ Route::middleware('company.auth')->group(function () {
     Route::get('/company/profile', [CompanyAuthController::class, 'profile'])
         ->name('company.profile');
 
+    Route::put('/company/profile', [CompanyAuthController::class, 'updateProfile'])
+        ->name('company.profile.update');
+
+    Route::put('/company/password', [CompanyAuthController::class, 'updatePassword'])
+        ->name('company.password.update');
+
     // Create Job
-    Route::get('/company/job/create', [JobController::class, 'create']);
+    Route::get('/company/job/create', [JobController::class, 'create'])
+        ->name('company.job.create');
 
     // Store Job
-    Route::post('/company/job/store', [JobController::class, 'store']);
+    Route::post('/company/job/store', [JobController::class, 'store'])
+        ->name('company.job.store');
 
     // Manage Jobs
     Route::get('/company/jobs', [JobController::class, 'index'])
@@ -109,6 +118,19 @@ Route::middleware('company.auth')->group(function () {
     // Delete Job
     Route::delete('/company/job/delete/{id}', [JobController::class, 'destroy'])
         ->name('job.delete');
+
+    // Applicant Management
+    Route::get('/company/applications', [CompanyApplicantController::class, 'index'])
+        ->name('company.applications');
+
+    Route::get('/company/jobs/{jobId}/applications', [CompanyApplicantController::class, 'jobApplicants'])
+        ->name('company.job.applications');
+
+    Route::get('/company/applications/{id}', [CompanyApplicantController::class, 'show'])
+        ->name('company.application.show');
+
+    Route::patch('/company/applications/{id}/status', [CompanyApplicantController::class, 'updateStatus'])
+        ->name('company.application.updateStatus');
 });
 
 Route::middleware('student')->group(function (){
@@ -147,76 +169,53 @@ Route::middleware('student')->group(function (){
     [StudentJobController::class, 'myApplications'])
     ->name('student.applications');
 
+    // Profile Management
+    Route::get('/student/profile', [StudentController::class, 'profile'])
+        ->name('student.profile');
+    Route::put('/student/profile', [StudentController::class, 'updateProfile'])
+        ->name('student.profile.update');
+    Route::put('/student/password', [StudentController::class, 'updatePassword'])
+        ->name('student.password.update');
+
 });
 
-// Admin Authentication
+// Protected Resume Download Route (Admin, Student owner, Company job-owner)
+Route::get('/applications/{id}/resume', [StudentJobController::class, 'downloadResume'])
+    ->name('applications.resume.download');
+
+// Admin Routes
 Route::prefix('admin')->group(function () {
 
-    // Login
-    Route::get('/login', [AuthController::class, 'showLogin'])
-        ->name('admin.login');
+    // Guest Admin Routes
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('admin.login');
+    Route::post('/login', [AuthController::class, 'login'])->name('admin.login.submit');
 
-    Route::post('/login', [AuthController::class, 'login'])
-        ->name('admin.login.submit');
+    // Protected Admin Routes
+    Route::middleware('admin')->group(function () {
+        Route::post('/logout', [AuthController::class, 'logout'])->name('admin.logout');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
-    // Logout
-    Route::post('/logout', [AuthController::class, 'logout'])
-        ->name('admin.logout');
+        // Company Management
+        Route::get('/companies', [CompanyController::class, 'index'])->name('admin.companies');
+        Route::get('/companies/{id}', [CompanyController::class, 'show'])->name('admin.companies.show');
+        Route::patch('/companies/{id}/approve', [CompanyController::class, 'approve'])->name('admin.companies.approve');
+        Route::patch('/companies/{id}/reject', [CompanyController::class, 'reject'])->name('admin.companies.reject');
 
-    Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware('admin')
-    ->name('admin.dashboard');
+        // Student Management
+        Route::get('/students', [AdminStudentController::class, 'index'])->name('admin.students');
+        Route::get('/students/{id}', [AdminStudentController::class, 'show'])->name('admin.students.show');
+        Route::delete('/students/{id}', [AdminStudentController::class, 'destroy'])->name('admin.students.delete');
 
-    // Company Management
-Route::get('/companies', [CompanyController::class, 'index'])
-    ->middleware('admin')
-    ->name('admin.companies');
+        // Job Management
+        Route::get('/jobs', [AdminJobController::class, 'index'])->name('admin.jobs');
+        Route::get('/jobs/{id}', [AdminJobController::class, 'show'])->name('admin.jobs.show');
+        Route::delete('/jobs/{id}', [AdminJobController::class, 'destroy'])->name('admin.jobs.delete');
 
-Route::patch('/companies/{id}/approve', [CompanyController::class, 'approve'])
-    ->middleware('admin')
-    ->name('admin.companies.approve');
-
-Route::patch('/companies/{id}/reject', [CompanyController::class, 'reject'])
-    ->middleware('admin')
-    ->name('admin.companies.reject');
-
-    // Student Management
-Route::get('/students', [AdminStudentController::class, 'index'])
-    ->middleware('admin')
-    ->name('admin.students');
-
-Route::get('/students/{id}', [AdminStudentController::class, 'show'])
-    ->middleware('admin')
-    ->name('admin.students.show');
-
-Route::delete('/students/{id}', [AdminStudentController::class, 'destroy'])
-    ->middleware('admin')
-    ->name('admin.students.delete');
-
-    // Job Management
-Route::get('/jobs', [AdminJobController::class, 'index'])
-    ->middleware('admin')
-    ->name('admin.jobs');
-
-Route::get('/jobs/{id}', [AdminJobController::class, 'show'])
-    ->middleware('admin')
-    ->name('admin.jobs.show');
-
-Route::delete('/jobs/{id}', [AdminJobController::class, 'destroy'])
-    ->middleware('admin')
-    ->name('admin.jobs.delete');
-
-    Route::get('/applications', [ApplicationController::class, 'index'])
-    ->middleware('admin')
-    ->name('admin.applications');
-
-Route::get('/applications/{id}', [ApplicationController::class, 'show'])
-    ->middleware('admin')
-    ->name('admin.applications.show');
-
-Route::delete('/applications/{id}', [ApplicationController::class, 'destroy'])
-    ->middleware('admin')
-    ->name('admin.applications.delete');
+        // Application Management
+        Route::get('/applications', [ApplicationController::class, 'index'])->name('admin.applications');
+        Route::get('/applications/{id}', [ApplicationController::class, 'show'])->name('admin.applications.show');
+        Route::delete('/applications/{id}', [ApplicationController::class, 'destroy'])->name('admin.applications.delete');
+    });
 
 });
 

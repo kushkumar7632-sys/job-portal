@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml"
+      href="{{ asset('jobportal.svg') }}?v=4">
 
     <title>Company Login | JobPortal</title>
 
@@ -101,8 +103,11 @@
 
                     <div class="flex gap-3">
 
-                        <span class="text-red-500">
-                            ⚠️
+                        <span class="text-red-500 mt-0.5">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="9" stroke-width="2"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v5M12 16h.01"/>
+                            </svg>
                         </span>
 
                         <div>
@@ -271,13 +276,10 @@
             </div>
 
 
-            <!-- Security -->
-            <!-- <div class="mt-6 text-center
-                        text-sm text-slate-400">
-
-                🔒 Your information is securely protected.
-
-            </div> -->
+            <!-- Security Note -->
+            <div class="mt-6 text-center text-xs text-slate-400">
+                Your company credentials and recruitment data are securely protected.
+            </div>
 
         </div>
 

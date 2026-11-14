@@ -16,4 +16,9 @@ class Student extends Model
     protected $hidden = [
         'password',
     ];
+
+    public function applications()
+    {
+        return $this->hasMany(Application::class);
+    }
 }

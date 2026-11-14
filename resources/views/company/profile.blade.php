@@ -1,541 +1,344 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Company Profile | JobPortal</title>
+@extends('layouts.company')
 
-    @vite('resources/css/app.css')
+@section('title', 'Company Profile')
+@section('header', 'Company Profile')
+@section('subheader', 'Manage your organization identity, contact details, and account security')
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+@section('content')
+<div class="space-y-8">
 
-        body {
-            font-family: Inter, sans-serif;
-        }
-
-        .hero {
-            background:
-                radial-gradient(circle at 85% 20%, rgba(59,130,246,.25), transparent 30%),
-                linear-gradient(115deg, #0f172a, #172554 60%, #1d4ed8);
-        }
-
-        .info-card {
-            transition: .25s ease;
-        }
-
-        .info-card:hover {
-            border-color: #bfdbfe;
-            background: #f8fbff;
-            transform: translateY(-2px);
-        }
-
-        .icon-box {
-            width: 46px;
-            height: 46px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-            flex-shrink: 0;
-        }
-    </style>
-</head>
-
-<body class="bg-slate-50 text-slate-800 min-h-screen">
-
-    <!-- NAVBAR -->
-    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
-
-        <div class="w-full px-5 lg:px-10 xl:px-14 h-20
-                    flex items-center justify-between">
-
-            <a href="{{ route('company.dashboard') }}"
-               class="flex items-center gap-3">
-
-                <div class="w-12 h-12 bg-blue-600 rounded-xl
-                            flex items-center justify-center
-                            text-white text-2xl font-bold shadow-lg">
-                    J
-                </div>
-
-                <div>
-                    <h1 class="text-2xl font-bold text-slate-900">
-                        Job<span class="text-blue-600">Portal</span>
-                    </h1>
-                    <p class="text-xs tracking-widest text-slate-400 font-semibold">
-                        EMPLOYER PORTAL
-                    </p>
-                </div>
-
-            </a>
-
-            <div class="flex items-center gap-5">
-
-                <span class="hidden md:block text-sm text-slate-500">
-                    Company Account
-                </span>
-
-                <a href="{{ route('company.dashboard') }}"
-                   class="bg-slate-900 hover:bg-blue-700 text-white
-                          px-6 py-3 rounded-xl font-semibold text-sm
-                          transition flex items-center gap-2">
-
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                         viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              stroke-width="2" d="M15 19l-7-7 7-7"/>
-                    </svg>
-
-                    Dashboard
-                </a>
-
-            </div>
-
-        </div>
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-2 text-xs font-medium text-slate-400">
+        <a href="{{ route('company.dashboard') }}" class="hover:text-blue-600 transition">Dashboard</a>
+        <span>/</span>
+        <span class="text-blue-600 font-semibold">Company Profile</span>
     </nav>
 
+    <!-- Company Overview Hero Card -->
+    <section class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-xs">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
 
-    <!-- MAIN -->
-    <main class="w-full px-5 lg:px-10 xl:px-14 py-9">
-
-        <!-- PAGE TITLE -->
-        <div class="flex flex-col md:flex-row md:items-end
-                    justify-between gap-4 mb-8">
-
-            <div>
-                <div class="text-sm text-slate-400 mb-3">
-                    <a href="{{ route('company.dashboard') }}"
-                       class="hover:text-blue-600">Dashboard</a>
-                    <span class="mx-2">/</span>
-                    <span class="text-blue-600 font-medium">Company Profile</span>
+            <div class="flex items-start sm:items-center gap-5">
+                <div class="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-100 text-blue-700 flex items-center justify-center font-bold text-2xl shrink-0 shadow-inner">
+                    {{ strtoupper(substr($company->company_name ?? 'C', 0, 1)) }}
                 </div>
 
-                <h2 class="text-3xl lg:text-4xl font-bold text-slate-900">
-                    Company Profile
-                </h2>
+                <div class="min-w-0">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <h2 class="text-2xl font-bold tracking-tight text-slate-900">
+                            {{ $company->company_name }}
+                        </h2>
 
-                <p class="text-slate-500 mt-2">
-                    View your registered company information and account details.
-                </p>
+                        @if($company->is_approved)
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                Verified Account
+                            </span>
+                        @else
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                Pending Approval
+                            </span>
+                        @endif
+                    </div>
+
+                    <p class="text-sm text-slate-500 mt-1">
+                        {{ $company->industry }} &bull; Managed by <span class="font-medium text-slate-700">{{ $company->owner_name }}</span>
+                    </p>
+
+                    <div class="mt-3 flex flex-wrap items-center gap-4 text-xs text-slate-400 font-medium">
+                        <span class="inline-flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 8l9 6 9-6M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                            {{ $company->email }}
+                        </span>
+
+                        <span class="inline-flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.95.68l1.5 4.49a1 1 0 01-.5 1.21l-2.1 1.05a11 11 0 005.42 5.42l1.05-2.1a1 1 0 011.21-.5l4.49 1.5a1 1 0 01.68.95V19a2 2 0 01-2 2h-1C9.16 21 3 14.84 3 7V5z"/>
+                            </svg>
+                            {{ $company->phone }}
+                        </span>
+
+                        @if($company->website)
+                            <span class="inline-flex items-center gap-1.5">
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="9" stroke-width="1.8"/>
+                                    <path stroke-linecap="round" stroke-width="1.8" d="M3 12h18m-9-9a14 14 0 010 18"/>
+                                </svg>
+                                <a href="{{ $company->website }}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">
+                                    {{ $company->website }}
+                                </a>
+                            </span>
+                        @endif
+
+                        <span class="inline-flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10" stroke-width="1.8"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6v6l4 2"/>
+                            </svg>
+                            Joined {{ $company->created_at ? $company->created_at->format('M Y') : 'N/A' }}
+                        </span>
+                    </div>
+                </div>
             </div>
 
-            <span class="inline-flex items-center gap-2 bg-green-50
-                         text-green-700 border border-green-100
-                         px-5 py-3 rounded-xl text-sm font-semibold">
-
-                <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                Active Account
-
-            </span>
+            <div class="flex sm:flex-col items-start sm:items-end gap-1.5 shrink-0">
+                <span class="text-xs text-slate-400 font-medium">Account Status</span>
+                <span class="text-xs font-semibold px-3 py-1 rounded-md bg-slate-100 text-slate-700 border border-slate-200">
+                    Verified Employer
+                </span>
+            </div>
 
         </div>
+    </section>
 
+    <!-- Forms Grid: Organization Details & Account Security -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-        <!-- HERO -->
-        <section class="hero rounded-3xl p-7 lg:p-10 text-white
-                        relative overflow-hidden mb-8">
-
-            <div class="relative z-10 flex flex-col md:flex-row
-                        md:items-center gap-7">
-
-                <div class="w-24 h-24 lg:w-28 lg:h-28 rounded-2xl
-                            bg-white/10 border border-white/20
-                            flex items-center justify-center
-                            text-5xl font-bold shrink-0">
-
-                    {{ strtoupper(substr($company->company_name, 0, 1)) }}
-
+        <!-- Organization Details Form -->
+        <section class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-xs flex flex-col justify-between">
+            <div>
+                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
+                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900">
+                            Organization Details
+                        </h3>
+                        <p class="text-xs text-slate-400 mt-0.5">
+                            Update your organization profile and public contact information
+                        </p>
+                    </div>
                 </div>
 
-                <div class="flex-1">
+                <form action="{{ route('company.profile.update') }}" method="POST" id="profileForm" class="space-y-4">
+                    @csrf
+                    @method('PUT')
 
-                    <p class="text-blue-200 text-xs tracking-widest
-                              font-bold mb-3">
-                        REGISTERED COMPANY
-                    </p>
+                    <!-- Company Name -->
+                    <div>
+                        <label for="company_name" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+                            Company Name <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text"
+                               id="company_name"
+                               name="company_name"
+                               required
+                               value="{{ old('company_name', $company->company_name) }}"
+                               placeholder="e.g. Acme Corporation"
+                               class="w-full rounded-lg border @error('company_name') border-red-300 ring-2 ring-red-100 @else border-slate-300 @enderror bg-white py-2.5 px-3.5 text-sm text-slate-800 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+                        @error('company_name')
+                            <p class="text-xs text-red-600 mt-1.5">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                    <h1 class="text-3xl lg:text-5xl font-bold mb-3">
-                        {{ $company->company_name }}
-                    </h1>
+                    <!-- Owner Name -->
+                    <div>
+                        <label for="owner_name" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+                            Owner / Contact Person <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text"
+                               id="owner_name"
+                               name="owner_name"
+                               required
+                               value="{{ old('owner_name', $company->owner_name) }}"
+                               placeholder="e.g. Jane Doe"
+                               class="w-full rounded-lg border @error('owner_name') border-red-300 ring-2 ring-red-100 @else border-slate-300 @enderror bg-white py-2.5 px-3.5 text-sm text-slate-800 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+                        @error('owner_name')
+                            <p class="text-xs text-red-600 mt-1.5">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                    <p class="text-blue-100 text-base lg:text-lg">
-                        {{ $company->industry }}
-                    </p>
+                    <!-- Email & Phone Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="email" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+                                Email Address <span class="text-red-500">*</span>
+                            </label>
+                            <input type="email"
+                                   id="email"
+                                   name="email"
+                                   required
+                                   value="{{ old('email', $company->email) }}"
+                                   placeholder="contact@company.com"
+                                   class="w-full rounded-lg border @error('email') border-red-300 ring-2 ring-red-100 @else border-slate-300 @enderror bg-white py-2.5 px-3.5 text-sm text-slate-800 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+                            @error('email')
+                                <p class="text-xs text-red-600 mt-1.5">{{ $message }}</p>
+                            @enderror
+                        </div>
 
-                </div>
+                        <div>
+                            <label for="phone" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+                                Phone Number <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text"
+                                   id="phone"
+                                   name="phone"
+                                   required
+                                   maxlength="10"
+                                   value="{{ old('phone', $company->phone) }}"
+                                   placeholder="10 digit number"
+                                   class="w-full rounded-lg border @error('phone') border-red-300 ring-2 ring-red-100 @else border-slate-300 @enderror bg-white py-2.5 px-3.5 text-sm text-slate-800 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+                            @error('phone')
+                                <p class="text-xs text-red-600 mt-1.5">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
 
-                <div class="md:text-right">
-                    <p class="text-blue-200 text-xs uppercase tracking-wider mb-2">
-                        Account Type
-                    </p>
+                    <!-- Industry & Website Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="industry" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+                                Industry Sector <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text"
+                                   id="industry"
+                                   name="industry"
+                                   required
+                                   value="{{ old('industry', $company->industry) }}"
+                                   placeholder="e.g. Information Technology"
+                                   class="w-full rounded-lg border @error('industry') border-red-300 ring-2 ring-red-100 @else border-slate-300 @enderror bg-white py-2.5 px-3.5 text-sm text-slate-800 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+                            @error('industry')
+                                <p class="text-xs text-red-600 mt-1.5">{{ $message }}</p>
+                            @enderror
+                        </div>
 
-                    <span class="inline-block bg-white/10 border
-                                 border-white/20 rounded-xl
-                                 px-5 py-3 font-semibold">
-                        Employer Account
-                    </span>
-                </div>
+                        <div>
+                            <label for="website" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+                                Website (Optional)
+                            </label>
+                            <input type="url"
+                                   id="website"
+                                   name="website"
+                                   value="{{ old('website', $company->website) }}"
+                                   placeholder="https://example.com"
+                                   class="w-full rounded-lg border @error('website') border-red-300 ring-2 ring-red-100 @else border-slate-300 @enderror bg-white py-2.5 px-3.5 text-sm text-slate-800 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+                            @error('website')
+                                <p class="text-xs text-red-600 mt-1.5">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
 
+                    <!-- Address -->
+                    <div>
+                        <label for="address" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+                            Office Address <span class="text-red-500">*</span>
+                        </label>
+                        <textarea id="address"
+                                  name="address"
+                                  required
+                                  rows="3"
+                                  placeholder="Enter complete office address..."
+                                  class="w-full rounded-lg border @error('address') border-red-300 ring-2 ring-red-100 @else border-slate-300 @enderror bg-white py-2.5 px-3.5 text-sm text-slate-800 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100">{{ old('address', $company->address) }}</textarea>
+                        @error('address')
+                            <p class="text-xs text-red-600 mt-1.5">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="pt-3">
+                        <button type="submit"
+                                class="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm px-6 py-2.5 rounded-lg shadow-sm transition w-full sm:w-auto">
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
             </div>
-
-            <div class="absolute -right-20 -bottom-40
-                        w-96 h-96 rounded-full border border-white/10"></div>
-
         </section>
 
-
-        <!-- FULL WIDTH CONTENT GRID -->
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-7">
-
-
-            <!-- COMPANY INFORMATION: 75% -->
-            <section class="lg:col-span-3 bg-white rounded-2xl
-                            border border-slate-200 overflow-hidden">
-
-                <div class="px-7 lg:px-9 py-7 border-b border-slate-100">
-
-                    <h3 class="text-xl lg:text-2xl font-bold text-slate-900">
-                        Company Information
-                    </h3>
-
-                    <p class="text-sm text-slate-400 mt-2">
-                        Your registered company details and contact information.
-                    </p>
-
-                </div>
-
-
-                <div class="p-6 lg:p-9 grid grid-cols-1 md:grid-cols-2
-                            xl:grid-cols-3 gap-5">
-
-
-                    <!-- COMPANY NAME -->
-                    <div class="info-card border border-slate-100
-                                rounded-2xl p-5">
-
-                        <div class="icon-box bg-blue-50 text-blue-600 mb-5">
-                            <svg class="w-6 h-6" fill="none"
-                                 stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      stroke-width="1.8"
-                                      d="M3 21h18M5 21V7l8-4v18m6 0V11l-6-4"/>
-                            </svg>
-                        </div>
-
-                        <p class="text-sm text-slate-400 mb-2">
-                            Company Name
-                        </p>
-
-                        <p class="font-bold text-lg text-slate-900 break-words">
-                            {{ $company->company_name }}
-                        </p>
-
-                    </div>
-
-
-                    <!-- OWNER -->
-                    <div class="info-card border border-slate-100
-                                rounded-2xl p-5">
-
-                        <div class="icon-box bg-indigo-50 text-indigo-600 mb-5">
-                            <svg class="w-6 h-6" fill="none"
-                                 stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      stroke-width="1.8"
-                                      d="M16 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2m12-13a4 4 0 11-8 0 4 4 0 018 0z"/>
-                            </svg>
-                        </div>
-
-                        <p class="text-sm text-slate-400 mb-2">
-                            Owner Name
-                        </p>
-
-                        <p class="font-bold text-lg text-slate-900">
-                            {{ $company->owner_name }}
-                        </p>
-
-                    </div>
-
-
-                    <!-- EMAIL -->
-                    <div class="info-card border border-slate-100
-                                rounded-2xl p-5">
-
-                        <div class="icon-box bg-sky-50 text-sky-600 mb-5">
-                            <svg class="w-6 h-6" fill="none"
-                                 stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      stroke-width="1.8"
-                                      d="M3 8l9 6 9-6M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                            </svg>
-                        </div>
-
-                        <p class="text-sm text-slate-400 mb-2">
-                            Email Address
-                        </p>
-
-                        <p class="font-bold text-lg text-slate-900 break-all">
-                            {{ $company->email }}
-                        </p>
-
-                    </div>
-
-
-                    <!-- PHONE -->
-                    <div class="info-card border border-slate-100
-                                rounded-2xl p-5">
-
-                        <div class="icon-box bg-green-50 text-green-600 mb-5">
-                            <svg class="w-6 h-6" fill="none"
-                                 stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      stroke-width="1.8"
-                                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.95.68l1.5 4.49a1 1 0 01-.5 1.21l-2.1 1.05a11 11 0 005.42 5.42l1.05-2.1a1 1 0 011.21-.5l4.49 1.5a1 1 0 01.68.95V19a2 2 0 01-2 2h-1C9.16 21 3 14.84 3 7V5z"/>
-                            </svg>
-                        </div>
-
-                        <p class="text-sm text-slate-400 mb-2">
-                            Phone Number
-                        </p>
-
-                        <p class="font-bold text-lg text-slate-900">
-                            {{ $company->phone }}
-                        </p>
-
-                    </div>
-
-
-                    <!-- INDUSTRY -->
-                    <div class="info-card border border-slate-100
-                                rounded-2xl p-5">
-
-                        <div class="icon-box bg-purple-50 text-purple-600 mb-5">
-                            <svg class="w-6 h-6" fill="none"
-                                 stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      stroke-width="1.8"
-                                      d="M4 21V5a2 2 0 012-2h12a2 2 0 012 2v16M4 21h16M8 7h2m4 0h2M8 11h2m4 0h2M8 15h2m4 0h2"/>
-                            </svg>
-                        </div>
-
-                        <p class="text-sm text-slate-400 mb-2">
-                            Industry
-                        </p>
-
-                        <p class="font-bold text-lg text-slate-900">
-                            {{ $company->industry }}
-                        </p>
-
-                    </div>
-
-
-                    <!-- WEBSITE -->
-                    <div class="info-card border border-slate-100
-                                rounded-2xl p-5">
-
-                        <div class="icon-box bg-orange-50 text-orange-600 mb-5">
-                            <svg class="w-6 h-6" fill="none"
-                                 stroke="currentColor" viewBox="0 0 24 24">
-                                <circle cx="12" cy="12" r="9"
-                                        stroke-width="1.8"/>
-                                <path stroke-linecap="round"
-                                      stroke-width="1.8"
-                                      d="M3 12h18m-9-9a14 14 0 010 18"/>
-                            </svg>
-                        </div>
-
-                        <p class="text-sm text-slate-400 mb-2">
-                            Website
-                        </p>
-
-                        <p class="font-bold text-lg text-slate-900 break-all">
-                            {{ $company->website ?? 'Not provided' }}
-                        </p>
-
-                    </div>
-
-
-                    <!-- ADDRESS -->
-                    <div class="info-card border border-slate-100
-                                rounded-2xl p-5 md:col-span-2 xl:col-span-3">
-
-                        <div class="icon-box bg-rose-50 text-rose-600 mb-5">
-                            <svg class="w-6 h-6" fill="none"
-                                 stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      stroke-width="1.8"
-                                      d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1116 0z"/>
-                                <circle cx="12" cy="10" r="2.5"
-                                        stroke-width="1.8"/>
-                            </svg>
-                        </div>
-
-                        <p class="text-sm text-slate-400 mb-2">
-                            Company Address
-                        </p>
-
-                        <p class="font-bold text-lg text-slate-900 leading-relaxed">
-                            {{ $company->address }}
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-
-            <!-- RIGHT SIDEBAR: 25% -->
-            <aside class="lg:col-span-1 space-y-6">
-
-
-                <!-- ACCOUNT SUMMARY -->
-                <div class="bg-white border border-slate-200
-                            rounded-2xl p-6 lg:p-7">
-
-                    <h3 class="text-xl font-bold text-slate-900">
-                        Account Overview
-                    </h3>
-
-                    <p class="text-sm text-slate-400 mt-2 mb-7">
-                        Your account summary.
-                    </p>
-
-
-                    <div class="space-y-6">
-
-                        <div>
-                            <p class="text-sm text-slate-400 mb-2">
-                                Account Status
-                            </p>
-
-                            <span class="inline-flex items-center gap-2
-                                         bg-green-50 text-green-700
-                                         px-4 py-2 rounded-lg text-sm font-semibold">
-
-                                <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-                                Active
-
-                            </span>
-                        </div>
-
-                        <div class="border-t border-slate-100"></div>
-
-                        <div>
-                            <p class="text-sm text-slate-400 mb-2">
-                                Account Type
-                            </p>
-
-                            <p class="font-bold text-slate-800">
-                                Employer
-                            </p>
-                        </div>
-
-                        <div class="border-t border-slate-100"></div>
-
-                        <div>
-                            <p class="text-sm text-slate-400 mb-2">
-                                Registered Industry
-                            </p>
-
-                            <p class="font-bold text-slate-800">
-                                {{ $company->industry }}
-                            </p>
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- HIRING CARD -->
-                <div class="bg-gradient-to-br from-blue-600 to-indigo-800
-                            rounded-2xl p-7 text-white">
-
-                    <div class="w-12 h-12 bg-white/15 rounded-xl
-                                flex items-center justify-center mb-6">
-
-                        <svg class="w-6 h-6" fill="none"
-                             stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="2"
-                                  d="M12 4v16m8-8H4"/>
+        <!-- Account Security / Change Password Form -->
+        <section class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-xs flex flex-col justify-between">
+            <div>
+                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
+                    <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center font-bold shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke-width="2"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11V7a5 5 0 0110 0v4"/>
                         </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900">
+                            Account Security
+                        </h3>
+                        <p class="text-xs text-slate-400 mt-0.5">
+                            Update your password to keep your company workspace protected
+                        </p>
+                    </div>
+                </div>
 
+                <form action="{{ route('company.password.update') }}" method="POST" id="passwordForm" class="space-y-4">
+                    @csrf
+                    @method('PUT')
+
+                    <!-- Current Password -->
+                    <div>
+                        <label for="current_password" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+                            Current Password <span class="text-red-500">*</span>
+                        </label>
+                        <input type="password"
+                               id="current_password"
+                               name="current_password"
+                               required
+                               placeholder="Enter your current password"
+                               class="w-full rounded-lg border @error('current_password') border-red-300 ring-2 ring-red-100 @else border-slate-300 @enderror bg-white py-2.5 px-3.5 text-sm text-slate-800 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+                        @error('current_password')
+                            <p class="text-xs text-red-600 mt-1.5">{{ $message }}</p>
+                        @enderror
                     </div>
 
-                    <h3 class="text-2xl font-bold mb-3">
-                        Start Hiring
-                    </h3>
+                    <!-- New Password -->
+                    <div>
+                        <label for="password" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+                            New Password <span class="text-red-500">*</span>
+                        </label>
+                        <input type="password"
+                               id="password"
+                               name="password"
+                               required
+                               placeholder="Minimum 8 characters"
+                               class="w-full rounded-lg border @error('password') border-red-300 ring-2 ring-red-100 @else border-slate-300 @enderror bg-white py-2.5 px-3.5 text-sm text-slate-800 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+                        @error('password')
+                            <p class="text-xs text-red-600 mt-1.5">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                    <p class="text-blue-100 text-sm leading-7">
-                        Publish job opportunities and connect with
-                        qualified candidates through JobPortal.
-                    </p>
+                    <!-- Confirm Password -->
+                    <div>
+                        <label for="password_confirmation" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+                            Confirm New Password <span class="text-red-500">*</span>
+                        </label>
+                        <input type="password"
+                               id="password_confirmation"
+                               name="password_confirmation"
+                               required
+                               placeholder="Re-enter your new password"
+                               class="w-full rounded-lg border border-slate-300 bg-white py-2.5 px-3.5 text-sm text-slate-800 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+                    </div>
 
-                    <a href="{{ url('/company/job/create') }}"
-                       class="mt-7 w-full flex justify-center items-center
-                              bg-white text-blue-700 hover:bg-blue-50
-                              py-3.5 rounded-xl font-bold transition">
+                    <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl text-xs text-slate-500 space-y-1">
+                        <p class="font-semibold text-slate-700">Password requirements:</p>
+                        <ul class="list-disc pl-4 space-y-0.5 text-slate-400">
+                            <li>Must be at least 8 characters long</li>
+                            <li>Must differ from your current password</li>
+                            <li>Both password fields must match exactly</li>
+                        </ul>
+                    </div>
 
-                        Post a Job
+                    <div class="pt-3">
+                        <button type="submit"
+                                class="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm px-6 py-2.5 rounded-lg shadow-sm transition w-full sm:w-auto">
+                            Update Password
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
 
-                    </a>
+    </div>
 
-                </div>
-
-
-                <!-- PROFILE NOTE -->
-                <div class="bg-white border border-slate-200
-                            rounded-2xl p-6">
-
-                    <h3 class="font-bold text-slate-900 mb-3">
-                        Profile Information
-                    </h3>
-
-                    <p class="text-sm text-slate-500 leading-7">
-                        Keep your company information accurate and
-                        updated to build trust with potential candidates.
-                    </p>
-
-                </div>
-
-            </aside>
-
-        </div>
-
-    </main>
-
-
-    <!-- FOOTER -->
-    <footer class="bg-white border-t border-slate-200 mt-12">
-
-        <div class="w-full px-5 lg:px-10 xl:px-14 py-7
-                    flex flex-col md:flex-row
-                    justify-between items-center gap-3">
-
-            <p class="text-sm text-slate-500">
-                © {{ date('Y') }} JobPortal. All rights reserved.
-            </p>
-
-            <p class="text-sm text-slate-400">
-                Professional hiring made simple.
-            </p>
-
-        </div>
-
-    </footer>
-
-</body>
-</html>
+</div>
+@endsection

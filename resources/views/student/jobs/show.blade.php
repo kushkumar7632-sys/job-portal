@@ -1,798 +1,375 @@
-```blade
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.student')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+@section('title', $job->job_title)
+@section('header', 'Job Details')
+@section('subheader', 'Explore role details and submit your application')
 
-    <title>Upload Resume | JobPortal</title>
-
-    @vite('resources/css/app.css')
-</head>
-
+@section('content')
 @php
-    $studentName = session('student_name', 'Student');
-    $studentInitial = strtoupper(substr($studentName, 0, 1));
+    $isDeadlinePassed = \Carbon\Carbon::parse($job->deadline)->isPast() && !\Carbon\Carbon::parse($job->deadline)->isToday();
 @endphp
 
-<body class="min-h-screen bg-[#f5f7fa] text-slate-800 antialiased">
-
-<div class="flex min-h-screen">
-
-    <!-- SIDEBAR -->
-    <aside class="fixed inset-y-0 left-0 z-40 hidden w-[260px] flex-col bg-[#080d20] text-white lg:flex">
-
-        <div class="flex h-[84px] items-center border-b border-white/10 px-7">
-
-            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-[#5140ef] text-lg font-bold">
-                J
-            </div>
-
-            <span class="ml-3 text-xl font-semibold tracking-tight">
-                JobPortal
-            </span>
-
-        </div>
-
-
-        <div class="flex-1 px-5 py-8">
-
-            <p class="mb-4 px-3 text-[11px] font-semibold uppercase tracking-[0.15em] text-slate-500">
-                Workspace
-            </p>
-
-            <nav class="space-y-2">
-
-                <a href="{{ route('student.dashboard') }}"
-                   class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-slate-400 transition hover:bg-white/5 hover:text-white">
-
-                    <svg class="h-5 w-5" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="1.7">
-                        <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1z"/>
-                    </svg>
-
-                    Dashboard
-                </a>
-
-
-                <a href="{{ route('student.jobs') }}"
-                   class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-slate-400 transition hover:bg-white/5 hover:text-white">
-
-                    <svg class="h-5 w-5" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="1.7">
-                        <circle cx="11" cy="11" r="7"/>
-                        <path d="m16 16 4 4"/>
-                    </svg>
-
-                    Find Jobs
-                </a>
-
-
-                <a href="{{ url('/student/applications') }}"
-                   class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-slate-400 transition hover:bg-white/5 hover:text-white">
-
-                    <svg class="h-5 w-5" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="1.7">
-                        <rect x="5" y="3" width="14" height="18" rx="2"/>
-                        <path d="M9 8h6M9 12h6M9 16h4"/>
-                    </svg>
-
-                    My Applications
-                </a>
-
-            </nav>
-
-
-            <div class="my-7 border-t border-white/10"></div>
-
-
-            <p class="mb-4 px-3 text-[11px] font-semibold uppercase tracking-[0.15em] text-slate-500">
-                Account
-            </p>
-
-
-            <div class="flex items-center gap-3 px-4 py-3">
-
-                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-sm font-semibold text-slate-300">
-                    {{ $studentInitial }}
-                </div>
-
-                <div class="min-w-0">
-
-                    <p class="truncate text-sm font-semibold text-white">
-                        {{ $studentName }}
-                    </p>
-
-                    <p class="text-xs text-slate-500">
-                        Student Account
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="border-t border-white/10 px-7 py-5">
-
-            <p class="text-xs text-slate-500">
-                JobPortal Student Workspace
-            </p>
-
-        </div>
-
-    </aside>
-
-
-    <!-- MAIN AREA -->
-    <div class="flex min-h-screen w-full flex-col lg:ml-[260px]">
-
-
-        <!-- TOP NAVBAR -->
-        <header class="sticky top-0 z-30 flex h-[76px] items-center justify-between border-b border-slate-200 bg-white px-5 sm:px-8 lg:px-10">
-
-            <div>
-
-                <h2 class="text-lg font-semibold text-[#172b40]">
-                    Resume Management
-                </h2>
-
-                <p class="hidden text-xs text-slate-400 sm:block">
-                    Manage your career documents
-                </p>
-
-            </div>
-
-
-            <div class="flex items-center gap-4">
-
-                <div class="hidden text-right sm:block">
-
-                    <p class="text-sm font-semibold text-slate-800">
-                        {{ $studentName }}
-                    </p>
-
-                    <p class="text-xs text-slate-400">
-                        Student
-                    </p>
-
-                </div>
-
-
-                <div class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-[#edf1ff] font-semibold text-[#5140ef]">
-                    {{ $studentInitial }}
-                </div>
-
-
-                <a href="{{ route('student.dashboard') }}"
-                   class="hidden rounded-md border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50 md:inline-flex">
-
-                    Dashboard
-
-                </a>
-
-            </div>
-
-        </header>
-
-
-
-        <!-- PAGE CONTENT -->
-        <main class="flex-1 px-5 py-8 sm:px-8 lg:px-10 lg:py-10">
-
-
             <!-- BREADCRUMB -->
-            <nav class="mb-7 flex flex-wrap items-center gap-2 text-xs font-medium text-slate-400">
-
-                <a href="{{ route('student.dashboard') }}"
-                   class="hover:text-[#5140ef]">
+            <nav class="mb-6 flex flex-wrap items-center gap-2 text-xs font-medium text-slate-400">
+                <a href="{{ route('student.dashboard') }}" class="hover:text-[#5140ef]">
                     Dashboard
                 </a>
-
                 <span>/</span>
-
-                <a href="{{ route('student.jobs') }}"
-                   class="hover:text-[#5140ef]">
+                <a href="{{ route('student.jobs') }}" class="hover:text-[#5140ef]">
                     Find Jobs
                 </a>
-
                 <span>/</span>
-
-                <a href="{{ route('student.job.details', $application->job_id) }}"
-                   class="hover:text-[#5140ef]">
-                    Job Details
-                </a>
-
-                <span>/</span>
-
                 <span class="text-slate-700">
-                    Upload Resume
+                    {{ $job->job_title }}
                 </span>
-
             </nav>
 
-
-
-            <!-- PAGE HEADING -->
-            <section class="mb-8">
-
-                <p class="text-xs font-semibold uppercase tracking-[0.15em] text-[#5140ef]">
-                    CAREER DOCUMENTS
-                </p>
-
-                <h1 class="mt-2 text-2xl font-bold tracking-tight text-[#172b40] sm:text-3xl">
-                    Upload Your Resume
-                </h1>
-
-                <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-                    Submit your latest resume to complete your job application and help employers evaluate your qualifications.
-                </p>
-
-            </section>
-
-
-
-            <!-- BACK LINK -->
+            <!-- BACK TO JOBS BUTTON -->
             <div class="mb-6">
-
-                <a href="{{ route('student.job.details', $application->job_id) }}"
+                <a href="{{ route('student.jobs') }}"
                    class="inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-[#5140ef]">
-
-                    <svg class="h-4 w-4" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="1.8">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                         <path d="M19 12H5M12 19l-7-7 7-7"/>
                     </svg>
-
-                    Back to Job Details
-
+                    Back to All Jobs
                 </a>
-
             </div>
 
+            <!-- JOB HERO BANNER CARD -->
+            <section class="mb-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                <div class="flex flex-col justify-between gap-6 md:flex-row md:items-center">
 
+                    <div class="flex items-start gap-5">
+                        <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-2xl font-bold text-[#5140ef]">
+                            {{ strtoupper(substr($job->job_title, 0, 1)) }}
+                        </div>
 
-            <!-- MAIN GRID -->
-            <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+                        <div>
+                            <div class="flex flex-wrap items-center gap-3">
+                                <h1 class="text-2xl font-bold tracking-tight text-[#172b40] sm:text-3xl">
+                                    {{ $job->job_title }}
+                                </h1>
+                                <span class="rounded-md border border-[#dce4f3] bg-[#f3f6fc] px-3 py-1 text-xs font-semibold text-[#45648a]">
+                                    {{ $job->job_type }}
+                                </span>
+                            </div>
 
+                            <p class="mt-2 text-base font-semibold text-slate-700">
+                                {{ $job->company->company_name ?? 'Company' }}
+                            </p>
 
-                <!-- UPLOAD FORM -->
-                <section class="overflow-hidden border border-slate-200 bg-white xl:col-span-2">
+                            <div class="mt-3 flex flex-wrap items-center gap-4 text-xs font-medium text-slate-500">
+                                <span class="inline-flex items-center gap-1.5">
+                                    <svg class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                        <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/>
+                                        <circle cx="12" cy="10" r="2.5"/>
+                                    </svg>
+                                    {{ $job->location }}
+                                </span>
 
+                                <span class="inline-flex items-center gap-1.5">
+                                    <svg class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+                                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                                    </svg>
+                                    {{ $job->experience }}
+                                </span>
 
-                    <!-- FORM HEADER -->
-                    <div class="border-b border-slate-200 px-6 py-5 sm:px-8">
-
-                        <h2 class="text-lg font-semibold text-[#172b40]">
-                            Resume Information
-                        </h2>
-
-                        <p class="mt-1 text-xs text-slate-400">
-                            Upload a document for your job application.
-                        </p>
-
+                                <span class="inline-flex items-center gap-1.5">
+                                    <svg class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <path d="M12 6v6l4 2"/>
+                                    </svg>
+                                    Posted {{ $job->created_at->diffForHumans() }}
+                                </span>
+                            </div>
+                        </div>
                     </div>
 
-
-
-                    <!-- FORM BODY -->
-                    <div class="p-6 sm:p-8">
-
-
-                        <!-- SUCCESS MESSAGE -->
-                        @if(session('success'))
-
-                            <div class="mb-6 flex items-start gap-3 border border-green-200 bg-green-50 px-4 py-4 text-green-700">
-
-                                <svg class="mt-0.5 h-5 w-5 shrink-0"
-                                     viewBox="0 0 24 24"
-                                     fill="none"
-                                     stroke="currentColor"
-                                     stroke-width="2">
-                                    <path d="m5 12 4 4L19 6"/>
-                                </svg>
-
-                                <p class="text-sm font-medium">
-                                    {{ session('success') }}
-                                </p>
-
-                            </div>
-
-                        @endif
-
-
-
-                        <!-- VALIDATION ERRORS -->
-                        @if ($errors->any())
-
-                            <div class="mb-6 border border-red-200 bg-red-50 px-5 py-4 text-red-700">
-
-                                <p class="mb-2 text-sm font-semibold">
-                                    Please correct the following errors:
-                                </p>
-
-                                <ul class="list-inside list-disc space-y-1 text-sm">
-
-                                    @foreach ($errors->all() as $error)
-
-                                        <li>{{ $error }}</li>
-
-                                    @endforeach
-
-                                </ul>
-
-                            </div>
-
-                        @endif
-
-
-
-                        <!-- ORIGINAL FORM ACTION PRESERVED -->
-                        <form
-                            action="{{ route('student.resume.store', $application->job_id) }}"
-                            method="POST"
-                            enctype="multipart/form-data">
-
-                            @csrf
-
-
-                            <div class="mb-5">
-
-                                <label for="resume"
-                                       class="block text-sm font-semibold text-slate-700">
-
-                                    Select Your Resume
-
-                                    <span class="text-red-500">*</span>
-
-                                </label>
-
-                                <p class="mt-1 text-xs text-slate-400">
-                                    Choose your latest professional resume.
-                                </p>
-
-                            </div>
-
-
-
-                            <!-- FILE UPLOAD AREA -->
-                            <label for="resume"
-                                   class="group flex min-h-[270px] cursor-pointer flex-col items-center justify-center border-2 border-dashed border-slate-300 bg-[#fafbfc] px-5 py-9 text-center transition hover:border-[#5140ef] hover:bg-[#f8f8ff]">
-
-
-                                <div class="flex h-16 w-16 items-center justify-center bg-[#f0f2ff] text-[#5140ef]">
-
-                                    <svg class="h-8 w-8"
-                                         viewBox="0 0 24 24"
-                                         fill="none"
-                                         stroke="currentColor"
-                                         stroke-width="1.6">
-                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                        <path d="M14 2v6h6M8 13h8M8 17h8"/>
-                                    </svg>
-
-                                </div>
-
-
-                                <h3 class="mt-5 text-base font-semibold text-[#172b40]">
-                                    Choose your resume
-                                </h3>
-
-
-                                <p class="mt-2 text-sm text-slate-500">
-                                    Click to browse files from your device.
-                                </p>
-
-
-                                <p class="mt-2 text-xs text-slate-400">
-                                    Supported formats: PDF, DOC, DOCX
-                                </p>
-
-
-                                <!-- ORIGINAL INPUT NAME PRESERVED -->
-                                <input
-                                    type="file"
-                                    id="resume"
-                                    name="resume"
-                                    accept=".pdf,.doc,.docx"
-                                    required
-                                    class="sr-only">
-
-
-                                <!-- SELECTED FILE INFORMATION -->
-                                <div id="fileInfo"
-                                     class="mt-5 hidden w-full max-w-md items-center gap-3 border border-slate-200 bg-white p-3 text-left">
-
-                                    <div class="flex h-10 w-10 shrink-0 items-center justify-center bg-[#f0f2ff] text-[#5140ef]">
-
-                                        <svg class="h-5 w-5"
-                                             viewBox="0 0 24 24"
-                                             fill="none"
-                                             stroke="currentColor"
-                                             stroke-width="1.7">
-                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                            <path d="M14 2v6h6"/>
-                                        </svg>
-
-                                    </div>
-
-
-                                    <div class="min-w-0 flex-1">
-
-                                        <p id="fileName"
-                                           class="truncate text-sm font-semibold text-slate-700">
-                                        </p>
-
-                                        <p id="fileSize"
-                                           class="mt-1 text-xs text-slate-400">
-                                        </p>
-
-                                    </div>
-
-
-                                    <svg class="h-5 w-5 shrink-0 text-green-600"
-                                         viewBox="0 0 24 24"
-                                         fill="none"
-                                         stroke="currentColor"
-                                         stroke-width="2">
+                    <!-- TOP APPLY ACTION -->
+                    <div class="flex shrink-0 items-center">
+                        @if($alreadyApplied)
+                            <div class="flex flex-col gap-2 sm:items-end">
+                                <span class="inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-5 py-2.5 text-sm font-semibold text-emerald-700">
+                                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="m5 12 4 4L19 6"/>
                                     </svg>
-
-                                </div>
-
-                            </label>
-
-
-
-                            <!-- FILE FORMATS -->
-                            <div class="mt-5 flex flex-wrap gap-3">
-
-                                <span class="border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-600">
-                                    PDF
+                                    Application Submitted
                                 </span>
 
-                                <span class="border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-600">
-                                    DOC
-                                </span>
-
-                                <span class="border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-600">
-                                    DOCX
-                                </span>
-
-                                <span class="border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-600">
-                                    Maximum 2 MB
-                                </span>
-
+                                @if(!$application->resume)
+                                    <a href="{{ route('student.resume.upload', $job->id) }}"
+                                       class="inline-flex items-center gap-1 text-xs font-semibold text-amber-600 hover:underline">
+                                        ⚠️ Upload your resume to complete application →
+                                    </a>
+                                @else
+                                    <div class="flex items-center gap-2">
+                                        <a href="{{ route('applications.resume.download', $application->id) }}"
+                                           target="_blank"
+                                           class="text-xs font-semibold text-indigo-600 hover:underline">
+                                            View Resume ↗
+                                        </a>
+                                        <span class="text-slate-300">|</span>
+                                        <a href="{{ route('student.applications') }}"
+                                           class="text-xs font-semibold text-slate-500 hover:underline">
+                                            My Applications →
+                                        </a>
+                                    </div>
+                                @endif
                             </div>
-
-
-
-                            <!-- SUBMIT -->
-                            <div class="mt-7 border-t border-slate-100 pt-6">
-
-                                <button
-                                    type="submit"
-                                    class="inline-flex h-11 w-full items-center justify-center gap-2 bg-[#5140ef] px-6 text-sm font-semibold text-white transition hover:bg-[#4032d1] sm:w-auto">
-
-                                    Upload Resume
-
-                                    <svg class="h-4 w-4"
-                                         viewBox="0 0 24 24"
-                                         fill="none"
-                                         stroke="currentColor"
-                                         stroke-width="1.8">
-                                        <path d="M5 12h14M13 6l6 6-6 6"/>
+                        @elseif($isDeadlinePassed)
+                            <span class="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-5 py-2.5 text-sm font-semibold text-red-700">
+                                Applications Closed
+                            </span>
+                        @else
+                            <form action="{{ route('student.job.apply', $job->id) }}" method="POST">
+                                @csrf
+                                <button type="submit"
+                                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#5140ef] px-7 py-3.5 text-sm font-semibold text-white shadow-md shadow-indigo-950/20 transition hover:bg-[#4030d0]">
+                                    Apply Now
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                                     </svg>
-
                                 </button>
+                            </form>
+                        @endif
+                    </div>
 
+                </div>
+            </section>
+
+            <!-- MAIN 2-COLUMN CONTENT GRID -->
+            <div class="grid grid-cols-1 gap-8 xl:grid-cols-3">
+
+                <!-- LEFT COLUMN: JOB DESCRIPTION & COMPANY INFO -->
+                <div class="space-y-8 xl:col-span-2">
+
+                    <!-- JOB DESCRIPTION -->
+                    <section class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+                        <h2 class="text-xl font-bold text-[#172b40]">
+                            Job Description
+                        </h2>
+                        <div class="my-5 border-t border-slate-100"></div>
+
+                        <div class="prose max-w-none text-sm leading-7 text-slate-600 whitespace-pre-line">
+                            {{ $job->description }}
+                        </div>
+                    </section>
+
+                    <!-- ABOUT THE COMPANY -->
+                    <section class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+                        <h2 class="text-xl font-bold text-[#172b40]">
+                            About {{ $job->company->company_name ?? 'the Employer' }}
+                        </h2>
+                        <div class="my-5 border-t border-slate-100"></div>
+
+                        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 text-sm">
+                            <div>
+                                <p class="text-xs text-slate-400">Industry</p>
+                                <p class="mt-1 font-semibold text-slate-800">
+                                    {{ $job->company->industry ?? 'Not specified' }}
+                                </p>
                             </div>
 
+                            @if(!empty($job->company->website))
+                                <div>
+                                    <p class="text-xs text-slate-400">Website</p>
+                                    <p class="mt-1">
+                                        <a href="{{ $job->company->website }}" target="_blank" rel="noopener noreferrer"
+                                           class="font-semibold text-indigo-600 hover:underline">
+                                            {{ $job->company->website }} ↗
+                                        </a>
+                                    </p>
+                                </div>
+                            @endif
 
-                        </form>
+                            @if(!empty($job->company->address))
+                                <div class="sm:col-span-2">
+                                    <p class="text-xs text-slate-400">Office Location / Address</p>
+                                    <p class="mt-1 font-semibold text-slate-800">
+                                        {{ $job->company->address }}
+                                    </p>
+                                </div>
+                            @endif
+                        </div>
+                    </section>
+
+                </div>
+
+                <!-- RIGHT COLUMN: JOB OVERVIEW & APPLY CARD -->
+                <div class="space-y-6">
+
+                    <!-- JOB OVERVIEW CARD -->
+                    <div class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-7 shadow-sm">
+                        <h3 class="text-lg font-bold text-[#172b40]">
+                            Job Overview
+                        </h3>
+                        <div class="my-5 border-t border-slate-100"></div>
+
+                        <div class="space-y-5">
+
+                            <!-- Salary -->
+                            <div class="flex items-start gap-4">
+                                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+                                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                        <path d="M12 3v18M17 7.5c0-1.7-1.9-3-5-3s-5 1.3-5 3 1.5 2.5 5 3 5 1.3 5 3-1.9 3-5 3-5-1.3-5-3"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-400">Offered Salary</p>
+                                    <p class="mt-0.5 text-base font-bold text-slate-800">
+                                        {{ $job->salary }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Experience -->
+                            <div class="flex items-start gap-4">
+                                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+                                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                        <circle cx="12" cy="12" r="9"/>
+                                        <path d="M12 7v5l3 2"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-400">Experience</p>
+                                    <p class="mt-0.5 text-sm font-semibold text-slate-800">
+                                        {{ $job->experience }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Vacancy -->
+                            <div class="flex items-start gap-4">
+                                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-purple-50 text-purple-600">
+                                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                        <circle cx="9" cy="8" r="3"/>
+                                        <path d="M3 20v-1a6 6 0 0 1 12 0v1M16 5a3 3 0 0 1 0 6M18 14a5 5 0 0 1 3 5v1"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-400">Total Openings</p>
+                                    <p class="mt-0.5 text-sm font-semibold text-slate-800">
+                                        {{ $job->vacancy }} Openings
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Job Type -->
+                            <div class="flex items-start gap-4">
+                                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+                                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+                                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-400">Job Type</p>
+                                    <p class="mt-0.5 text-sm font-semibold text-slate-800">
+                                        {{ $job->job_type }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Location -->
+                            <div class="flex items-start gap-4">
+                                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+                                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                        <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/>
+                                        <circle cx="12" cy="10" r="2.5"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-400">Job Location</p>
+                                    <p class="mt-0.5 text-sm font-semibold text-slate-800">
+                                        {{ $job->location }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Deadline -->
+                            <div class="flex items-start gap-4">
+                                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-rose-50 text-rose-600">
+                                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                        <line x1="16" y1="2" x2="16" y2="6"/>
+                                        <line x1="8" y1="2" x2="8" y2="6"/>
+                                        <line x1="3" y1="10" x2="21" y2="10"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-400">Application Deadline</p>
+                                    <p class="mt-0.5 text-sm font-semibold {{ $isDeadlinePassed ? 'text-red-600 font-bold' : 'text-slate-800' }}">
+                                        {{ \Carbon\Carbon::parse($job->deadline)->format('d M, Y') }}
+                                        @if($isDeadlinePassed)
+                                            <span class="text-xs text-red-500">(Expired)</span>
+                                        @endif
+                                    </p>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- SIDEBAR APPLICATION ACTION -->
+                        <div class="mt-8 border-t border-slate-100 pt-6">
+                            @if($alreadyApplied)
+                                <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-center">
+                                    <p class="text-sm font-semibold text-emerald-800">
+                                        ✓ Application Submitted
+                                    </p>
+                                    <p class="mt-1 text-xs text-emerald-600">
+                                        Status: <span class="font-bold">{{ $application->status }}</span>
+                                    </p>
+                                    @if(!$application->resume)
+                                        <a href="{{ route('student.resume.upload', $job->id) }}"
+                                           class="mt-3 inline-block rounded-lg bg-amber-600 px-4 py-2 text-xs font-semibold text-white hover:bg-amber-700">
+                                            Upload Resume Now
+                                        </a>
+                                    @else
+                                        <div class="mt-3 flex items-center justify-center gap-2">
+                                            <a href="{{ route('applications.resume.download', $application->id) }}"
+                                               target="_blank"
+                                               class="text-xs font-semibold text-indigo-600 hover:underline">
+                                                View Resume ↗
+                                            </a>
+                                            <span class="text-slate-300">|</span>
+                                            <a href="{{ route('student.applications') }}"
+                                               class="text-xs font-semibold text-slate-500 hover:underline">
+                                                My Applications →
+                                            </a>
+                                        </div>
+                                    @endif
+                                </div>
+                            @elseif($isDeadlinePassed)
+                                <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-center">
+                                    <p class="text-sm font-semibold text-red-700">
+                                        Deadline Expired
+                                    </p>
+                                    <p class="mt-1 text-xs text-red-600">
+                                        This job opening is no longer accepting applications.
+                                    </p>
+                                </div>
+                            @else
+                                <form action="{{ route('student.job.apply', $job->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit"
+                                            class="w-full flex items-center justify-center gap-2 rounded-xl bg-[#5140ef] py-3.5 px-6 text-sm font-semibold text-white shadow-md shadow-indigo-950/20 transition hover:bg-[#4030d0]">
+                                        Apply for this Position
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                        </svg>
+                                    </button>
+                                </form>
+                                <p class="mt-3 text-center text-xs text-slate-400">
+                                    Applying will register your application and prompt you to submit your resume.
+                                </p>
+                            @endif
+                        </div>
 
                     </div>
 
-                </section>
-
-
-
-                <!-- RIGHT INFORMATION PANEL -->
-                <aside class="space-y-6">
-
-
-                    <!-- RESUME GUIDELINES -->
-                    <section class="border border-slate-200 bg-white">
-
-                        <div class="border-b border-slate-200 px-5 py-4">
-
-                            <h3 class="text-sm font-semibold text-[#172b40]">
-                                Resume Guidelines
-                            </h3>
-
-                        </div>
-
-
-                        <div class="space-y-5 p-5">
-
-
-                            <div class="flex gap-3">
-
-                                <div class="flex h-8 w-8 shrink-0 items-center justify-center bg-[#f0f2ff] text-[#5140ef]">
-
-                                    <svg class="h-4 w-4" viewBox="0 0 24 24"
-                                         fill="none" stroke="currentColor" stroke-width="1.8">
-                                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                                    </svg>
-
-                                </div>
-
-                                <div>
-
-                                    <p class="text-sm font-semibold text-slate-700">
-                                        Keep it updated
-                                    </p>
-
-                                    <p class="mt-1 text-xs leading-5 text-slate-500">
-                                        Include your latest educational and professional details.
-                                    </p>
-
-                                </div>
-
-                            </div>
-
-
-
-                            <div class="flex gap-3">
-
-                                <div class="flex h-8 w-8 shrink-0 items-center justify-center bg-[#f0f2ff] text-[#5140ef]">
-
-                                    <svg class="h-4 w-4" viewBox="0 0 24 24"
-                                         fill="none" stroke="currentColor" stroke-width="1.8">
-                                        <path d="M12 20h9"/>
-                                        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/>
-                                    </svg>
-
-                                </div>
-
-                                <div>
-
-                                    <p class="text-sm font-semibold text-slate-700">
-                                        Highlight your skills
-                                    </p>
-
-                                    <p class="mt-1 text-xs leading-5 text-slate-500">
-                                        Mention relevant technical skills and projects.
-                                    </p>
-
-                                </div>
-
-                            </div>
-
-
-
-                            <div class="flex gap-3">
-
-                                <div class="flex h-8 w-8 shrink-0 items-center justify-center bg-[#f0f2ff] text-[#5140ef]">
-
-                                    <svg class="h-4 w-4" viewBox="0 0 24 24"
-                                         fill="none" stroke="currentColor" stroke-width="1.8">
-                                        <circle cx="12" cy="12" r="9"/>
-                                        <path d="M12 11v5M12 8h.01"/>
-                                    </svg>
-
-                                </div>
-
-                                <div>
-
-                                    <p class="text-sm font-semibold text-slate-700">
-                                        Check your details
-                                    </p>
-
-                                    <p class="mt-1 text-xs leading-5 text-slate-500">
-                                        Verify your contact information before uploading.
-                                    </p>
-
-                                </div>
-
-                            </div>
-
-
-                        </div>
-
-                    </section>
-
-
-
-                    <!-- DOCUMENT SECURITY -->
-                    <section class="border border-slate-200 bg-white p-5">
-
-                        <div class="flex items-start gap-3">
-
-                            <div class="flex h-10 w-10 shrink-0 items-center justify-center bg-[#eef8f2] text-[#268453]">
-
-                                <svg class="h-5 w-5"
-                                     viewBox="0 0 24 24"
-                                     fill="none"
-                                     stroke="currentColor"
-                                     stroke-width="1.7">
-                                    <rect x="4" y="10" width="16" height="11" rx="2"/>
-                                    <path d="M8 10V7a4 4 0 1 1 8 0v3"/>
-                                </svg>
-
-                            </div>
-
-
-                            <div>
-
-                                <h3 class="text-sm font-semibold text-[#172b40]">
-                                    Document Security
-                                </h3>
-
-                                <p class="mt-2 text-xs leading-5 text-slate-500">
-                                    Your resume is associated with your job application through the platform's existing upload process.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                    </section>
-
-
-
-                    <!-- APPLICATION LINK -->
-                    <section class="border border-slate-200 bg-white p-5">
-
-                        <h3 class="text-sm font-semibold text-[#172b40]">
-                            Application Management
-                        </h3>
-
-                        <p class="mt-2 text-xs leading-5 text-slate-500">
-                            Review your submitted applications and check their current progress.
-                        </p>
-
-                        <a href="{{ url('/student/applications') }}"
-                           class="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-[#5140ef] hover:text-[#4032d1]">
-
-                            View My Applications
-
-                            <svg class="h-3.5 w-3.5" viewBox="0 0 24 24"
-                                 fill="none" stroke="currentColor" stroke-width="1.8">
-                                <path d="M5 12h14M13 6l6 6-6 6"/>
-                            </svg>
-
-                        </a>
-
-                    </section>
-
-
-                </aside>
+                </div>
 
             </div>
 
-        </main>
-
-
-
-        <!-- FOOTER -->
-        <footer class="border-t border-slate-200 bg-white px-5 py-5 sm:px-8 lg:px-10">
-
-            <div class="flex flex-col justify-between gap-2 text-xs text-slate-400 sm:flex-row sm:items-center">
-
-                <p>
-                    &copy; {{ date('Y') }} JobPortal. All rights reserved.
-                </p>
-
-                <p>
-                    Student Workspace
-                </p>
-
-            </div>
-
-        </footer>
-
-
-    </div>
-
-</div>
-
-
-
-<!-- MOBILE NAVIGATION -->
-<div class="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 bg-white lg:hidden">
-
-    <div class="grid grid-cols-3">
-
-
-        <a href="{{ route('student.dashboard') }}"
-           class="flex flex-col items-center gap-1 py-3 text-xs text-slate-500">
-
-            <svg class="h-5 w-5" viewBox="0 0 24 24"
-                 fill="none" stroke="currentColor" stroke-width="1.7">
-                <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1z"/>
-            </svg>
-
-            Dashboard
-
-        </a>
-
-
-        <a href="{{ route('student.jobs') }}"
-           class="flex flex-col items-center gap-1 py-3 text-xs text-slate-500">
-
-            <svg class="h-5 w-5" viewBox="0 0 24 24"
-                 fill="none" stroke="currentColor" stroke-width="1.7">
-                <circle cx="11" cy="11" r="7"/>
-                <path d="m16 16 4 4"/>
-            </svg>
-
-            Find Jobs
-
-        </a>
-
-
-        <a href="{{ url('/student/applications') }}"
-           class="flex flex-col items-center gap-1 py-3 text-xs text-slate-500">
-
-            <svg class="h-5 w-5" viewBox="0 0 24 24"
-                 fill="none" stroke="currentColor" stroke-width="1.7">
-                <rect x="5" y="3" width="14" height="18" rx="2"/>
-                <path d="M9 8h6M9 12h6M9 16h4"/>
-            </svg>
-
-            Applications
-
-        </a>
-
-
-    </div>
-
-</div>
-
-
-
-<!-- FILE PREVIEW -->
-<script>
-
-    const resumeInput = document.getElementById('resume');
-
-    const fileInfo = document.getElementById('fileInfo');
-
-    const fileName = document.getElementById('fileName');
-
-    const fileSize = document.getElementById('fileSize');
-
-
-    resumeInput.addEventListener('change', function () {
-
-        const file = this.files[0];
-
-        if (file) {
-
-            fileName.textContent = file.name;
-
-            fileSize.textContent =
-                (file.size / 1024).toFixed(1) + ' KB';
-
-            fileInfo.classList.remove('hidden');
-
-            fileInfo.classList.add('flex');
-
-        } else {
-
-            fileInfo.classList.add('hidden');
-
-            fileInfo.classList.remove('flex');
-
-        }
-
-    });
-
-</script>
-
-
-</body>
-</html>
-```
+@endsection

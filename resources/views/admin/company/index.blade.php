@@ -1,666 +1,299 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.admin')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+@section('title', 'Company Management')
+@section('header', 'Company Management')
 
-    <title>Manage Companies | JobPortal</title>
+@section('content')
+<div class="space-y-6">
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
+    @php
+        $totalCompanies = \App\Models\Company::count();
+        $approvedCompanies = \App\Models\Company::where('is_approved', 1)->count();
+        $pendingCompanies = \App\Models\Company::where('is_approved', 0)->count();
+    @endphp
 
-<body class="bg-slate-50 min-h-screen text-slate-800">
+    <!-- Statistics Overview Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <!-- Total Companies -->
+        <a href="{{ route('admin.companies') }}"
+           class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs hover:border-indigo-300 transition-colors flex items-center justify-between">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Companies</p>
+                <p class="text-2xl font-extrabold text-slate-900 mt-1">{{ number_format($totalCompanies) }}</p>
+                <p class="text-xs text-slate-400 mt-0.5">Registered employer accounts</p>
+            </div>
+            <div class="w-11 h-11 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <rect x="4" y="2" width="16" height="20" rx="2" stroke-width="2"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 22v-4h6v4M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01"/>
+                </svg>
+            </div>
+        </a>
 
-    <!-- ================= NAVBAR ================= -->
+        <!-- Approved Companies -->
+        <a href="{{ route('admin.companies', ['status' => 'approved']) }}"
+           class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs hover:border-emerald-300 transition-colors flex items-center justify-between">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Approved Companies</p>
+                <p class="text-2xl font-extrabold text-emerald-600 mt-1">{{ number_format($approvedCompanies) }}</p>
+                <p class="text-xs text-slate-400 mt-0.5">Active & verified employers</p>
+            </div>
+            <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+        </a>
 
-    <header class="sticky top-0 z-50 bg-white border-b border-slate-200">
+        <!-- Pending Verification -->
+        <a href="{{ route('admin.companies', ['status' => 'pending']) }}"
+           class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs hover:border-amber-300 transition-colors flex items-center justify-between">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Pending Approval</p>
+                <p class="text-2xl font-extrabold text-amber-600 mt-1">{{ number_format($pendingCompanies) }}</p>
+                <p class="text-xs text-slate-400 mt-0.5">Awaiting administrative review</p>
+            </div>
+            <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+            </div>
+        </a>
+    </div>
 
-        <div class="h-16 px-5 md:px-8 flex items-center justify-between">
-
-            <!-- Brand -->
-
-            <a href="{{ route('admin.dashboard') }}"
-               class="flex items-center gap-3">
-
-                <div
-                    class="w-10 h-10 rounded-xl bg-blue-600
-                           text-white flex items-center justify-center
-                           font-bold text-lg">
-
-                    JP
-
-                </div>
-
-                <div>
-
-                    <h1 class="font-bold text-lg leading-none">
-                        JobPortal
-                    </h1>
-
-                    <p class="text-xs text-slate-500 mt-1">
-                        Admin Panel
-                    </p>
-
-                </div>
-
-            </a>
-
-
-            <!-- Right -->
-
-            <div class="flex items-center gap-4">
-
-                <div class="hidden sm:block text-right">
-
-                    <p class="text-sm font-semibold text-slate-700">
-                        Administrator
-                    </p>
-
-                    <p class="text-xs text-slate-400">
-                        System Admin
-                    </p>
-
-                </div>
-
-
-                <div
-                    class="w-10 h-10 rounded-full
-                           bg-blue-100 text-blue-700
-                           flex items-center justify-center
-                           font-bold">
-
-                    A
-
-                </div>
-
-
-                <form action="{{ route('admin.logout') }}" method="POST">
-
-                    @csrf
-
-                    <button
-                        type="submit"
-                        class="flex items-center gap-2
-                               px-4 py-2 rounded-lg
-                               border border-slate-200
-                               text-sm font-medium text-slate-600
-                               hover:bg-red-50
-                               hover:text-red-600
-                               hover:border-red-200
-                               transition">
-
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="w-4 h-4"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor">
-
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2h5a2 2 0 012 2v1" />
-
+    <!-- Search & Filters Container -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
+        <form method="GET" action="{{ route('admin.companies') }}" class="space-y-4">
+            <div class="flex flex-col md:flex-row gap-3">
+                <!-- Search Input -->
+                <div class="flex-1 relative">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
+                    </div>
+                    <input type="text"
+                           name="search"
+                           value="{{ request('search') }}"
+                           placeholder="Search by company name, owner, email, or industry..."
+                           class="w-full pl-10 pr-4 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50/50">
+                </div>
 
-                        Logout
+                <!-- Approval Status Filter -->
+                <div class="w-full md:w-48">
+                    <select name="status"
+                            class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50/50 text-slate-700">
+                        <option value="">All Statuses</option>
+                        <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Approved Only</option>
+                        <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending Only</option>
+                    </select>
+                </div>
 
+                <!-- Action Buttons -->
+                <div class="flex items-center gap-2">
+                    <button type="submit"
+                            class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs transition-colors shrink-0">
+                        Apply Filter
                     </button>
 
-                </form>
-
+                    @if(request()->filled('search') || request()->filled('status'))
+                        <a href="{{ route('admin.companies') }}"
+                           class="px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition-colors shrink-0">
+                            Clear
+                        </a>
+                    @endif
+                </div>
             </div>
 
-        </div>
+            <!-- Quick Status Filter Pills -->
+            <div class="flex items-center gap-2 pt-2 border-t border-slate-100 text-xs">
+                <span class="text-slate-400 font-medium">Quick Filter:</span>
+                <a href="{{ route('admin.companies', array_merge(request()->except('status', 'page'), ['status' => ''])) }}"
+                   class="px-2.5 py-1 rounded-lg font-medium transition-colors {{ empty(request('status')) ? 'bg-slate-900 text-white font-semibold' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
+                    All ({{ $totalCompanies }})
+                </a>
+                <a href="{{ route('admin.companies', array_merge(request()->except('status', 'page'), ['status' => 'pending'])) }}"
+                   class="px-2.5 py-1 rounded-lg font-medium transition-colors {{ request('status') === 'pending' ? 'bg-amber-600 text-white font-semibold' : 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200' }}">
+                    Pending ({{ $pendingCompanies }})
+                </a>
+                <a href="{{ route('admin.companies', array_merge(request()->except('status', 'page'), ['status' => 'approved'])) }}"
+                   class="px-2.5 py-1 rounded-lg font-medium transition-colors {{ request('status') === 'approved' ? 'bg-emerald-600 text-white font-semibold' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200' }}">
+                    Approved ({{ $approvedCompanies }})
+                </a>
+            </div>
+        </form>
+    </div>
 
-    </header>
-
-
-    <!-- ================= MAIN ================= -->
-
-    <main class="max-w-7xl mx-auto px-5 md:px-8 py-8">
-
-
-        <!-- Breadcrumb -->
-
-        <div class="flex items-center gap-2 text-sm mb-5">
-
-            <a
-                href="{{ route('admin.dashboard') }}"
-                class="text-blue-600 hover:text-blue-700">
-
-                Dashboard
-
-            </a>
-
-            <span class="text-slate-400">
-                /
-            </span>
-
-            <span class="text-slate-500">
-                Companies
-            </span>
-
-        </div>
-
-
-        <!-- Page Header -->
-
-        <div
-            class="flex flex-col md:flex-row
-                   md:items-center md:justify-between
-                   gap-4 mb-7">
-
+    <!-- Companies Table Container -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div class="p-5 border-b border-slate-100 flex items-center justify-between">
             <div>
-
-                <div class="flex items-center gap-3">
-
-                    <div
-                        class="w-11 h-11 rounded-xl
-                               bg-blue-50 text-blue-600
-                               flex items-center justify-center">
-
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="w-6 h-6"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor">
-
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4M9 10h1m4 0h1m-6 4h1m4 0h1" />
-
-                        </svg>
-
-                    </div>
-
-                    <div>
-
-                        <h2 class="text-2xl md:text-3xl font-bold text-slate-900">
-                            Manage Companies
-                        </h2>
-
-                        <p class="text-sm text-slate-500 mt-1">
-                            Review and manage registered companies.
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- Company Count -->
-
-            <div
-                class="bg-white border border-slate-200
-                       rounded-xl px-5 py-3 shadow-sm">
-
-                <p class="text-xs text-slate-400">
-                    Total Companies
+                <h3 class="text-sm sm:text-base font-bold text-slate-900">
+                    Registered Companies
+                </h3>
+                <p class="text-xs text-slate-500 mt-0.5">
+                    Showing {{ $companies->firstItem() ?? 0 }} to {{ $companies->lastItem() ?? 0 }} of {{ $companies->total() }} companies
                 </p>
-
-                <p class="text-xl font-bold text-slate-900 mt-1">
-                    {{ $companies->count() }}
-                </p>
-
             </div>
-
         </div>
 
-
-        <!-- ================= SUCCESS MESSAGE ================= -->
-
-        @if(session('success'))
-
-            <div
-                class="mb-6 flex items-start gap-3
-                       bg-emerald-50
-                       border border-emerald-200
-                       text-emerald-700
-                       rounded-xl p-4">
-
-                <div
-                    class="w-8 h-8 rounded-lg
-                           bg-emerald-100
-                           flex items-center justify-center
-                           font-bold">
-
-                    ✓
-
-                </div>
-
-                <div>
-
-                    <p class="font-semibold text-sm">
-                        Success
-                    </p>
-
-                    <p class="text-sm mt-1">
-                        {{ session('success') }}
-                    </p>
-
-                </div>
-
-            </div>
-
-        @endif
-
-
-        <!-- ================= COMPANY TABLE ================= -->
-
-        <div
-            class="bg-white border border-slate-200
-                   rounded-2xl shadow-sm overflow-hidden">
-
-
-            <!-- Table Header -->
-
-            <div
-                class="px-6 py-5
-                       border-b border-slate-200
-                       flex items-center justify-between">
-
-                <div>
-
-                    <h3 class="font-bold text-slate-900">
-                        Registered Companies
-                    </h3>
-
-                    <p class="text-xs text-slate-500 mt-1">
-                        Review company accounts and approval status.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <!-- Responsive Table -->
-
+        @if($companies->count() > 0)
             <div class="overflow-x-auto">
-
-                <table class="w-full text-left">
-
-                    <thead class="bg-slate-50 border-b border-slate-200">
-
-                        <tr>
-
-                            <th
-                                class="px-6 py-4
-                                       text-xs font-semibold
-                                       uppercase tracking-wide
-                                       text-slate-500">
-
-                                Company
-
-                            </th>
-
-                            <th
-                                class="px-6 py-4
-                                       text-xs font-semibold
-                                       uppercase tracking-wide
-                                       text-slate-500">
-
-                                Owner
-
-                            </th>
-
-                            <th
-                                class="px-6 py-4
-                                       text-xs font-semibold
-                                       uppercase tracking-wide
-                                       text-slate-500">
-
-                                Email
-
-                            </th>
-
-                            <th
-                                class="px-6 py-4
-                                       text-xs font-semibold
-                                       uppercase tracking-wide
-                                       text-slate-500">
-
-                                Industry
-
-                            </th>
-
-                            <th
-                                class="px-6 py-4
-                                       text-xs font-semibold
-                                       uppercase tracking-wide
-                                       text-slate-500">
-
-                                Status
-
-                            </th>
-
-                            <th
-                                class="px-6 py-4
-                                       text-xs font-semibold
-                                       uppercase tracking-wide
-                                       text-slate-500">
-
-                                Action
-
-                            </th>
-
+                <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                    <thead>
+                        <tr class="bg-slate-50/75 border-b border-slate-100 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                            <th class="px-5 py-3.5">Company</th>
+                            <th class="px-5 py-3.5">Owner</th>
+                            <th class="px-5 py-3.5">Email</th>
+                            <th class="px-5 py-3.5">Industry</th>
+                            <th class="px-5 py-3.5">Jobs Posted</th>
+                            <th class="px-5 py-3.5">Status</th>
+                            <th class="px-5 py-3.5">Registered</th>
+                            <th class="px-5 py-3.5 text-right">Actions</th>
                         </tr>
-
                     </thead>
-
-
                     <tbody class="divide-y divide-slate-100">
-
-                        @forelse($companies as $company)
-
-                            <tr
-                                class="hover:bg-slate-50
-                                       transition">
-
-
-                                <!-- Company -->
-
-                                <td class="px-6 py-5">
-
+                        @foreach($companies as $company)
+                            <tr class="hover:bg-slate-50/60 transition-colors">
+                                <!-- Company Name + Avatar -->
+                                <td class="px-5 py-4">
                                     <div class="flex items-center gap-3">
-
-                                        <div
-                                            class="w-10 h-10 rounded-xl
-                                                   bg-blue-50
-                                                   text-blue-600
-                                                   flex items-center
-                                                   justify-center
-                                                   font-bold">
-
+                                        <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs shrink-0 border border-indigo-100">
                                             {{ strtoupper(substr($company->company_name, 0, 1)) }}
-
                                         </div>
-
-                                        <div>
-
-                                            <p
-                                                class="font-semibold
-                                                       text-slate-900">
-
+                                        <div class="min-w-0">
+                                            <a href="{{ route('admin.companies.show', $company->id) }}"
+                                               class="font-bold text-slate-900 hover:text-indigo-600 truncate block">
                                                 {{ $company->company_name }}
-
-                                            </p>
-
-                                            <p class="text-xs text-slate-400 mt-1">
-                                                Company
-                                            </p>
-
+                                            </a>
+                                            <span class="text-[11px] text-slate-400 block truncate">
+                                                ID: #{{ $company->id }}
+                                            </span>
                                         </div>
-
                                     </div>
-
                                 </td>
 
-
-                                <!-- Owner -->
-
-                                <td class="px-6 py-5">
-
-                                    <p class="text-sm font-medium text-slate-700">
-
-                                        {{ $company->owner_name }}
-
-                                    </p>
-
+                                <!-- Owner Name -->
+                                <td class="px-5 py-4 text-slate-700 font-medium whitespace-nowrap">
+                                    {{ $company->owner_name }}
                                 </td>
-
 
                                 <!-- Email -->
-
-                                <td class="px-6 py-5">
-
-                                    <p
-                                        class="text-sm text-slate-600
-                                               whitespace-nowrap">
-
-                                        {{ $company->email }}
-
-                                    </p>
-
+                                <td class="px-5 py-4 text-slate-600 whitespace-nowrap">
+                                    {{ $company->email }}
                                 </td>
-
 
                                 <!-- Industry -->
-
-                                <td class="px-6 py-5">
-
-                                    <span
-                                        class="inline-flex
-                                               px-3 py-1
-                                               rounded-lg
-                                               bg-slate-100
-                                               text-slate-600
-                                               text-sm">
-
+                                <td class="px-5 py-4 whitespace-nowrap">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
                                         {{ $company->industry }}
-
                                     </span>
-
                                 </td>
 
+                                <!-- Jobs Count -->
+                                <td class="px-5 py-4 whitespace-nowrap">
+                                    <span class="inline-flex items-center gap-1 font-semibold text-slate-700">
+                                        {{ $company->jobs_count ?? 0 }} Jobs
+                                    </span>
+                                </td>
 
-                                <!-- Status -->
-
-                                <td class="px-6 py-5">
-
+                                <!-- Status Badge -->
+                                <td class="px-5 py-4 whitespace-nowrap">
                                     @if($company->is_approved)
-
-                                        <span
-                                            class="inline-flex
-                                                   items-center gap-2
-                                                   px-3 py-1.5
-                                                   rounded-full
-                                                   text-xs font-semibold
-                                                   bg-emerald-50
-                                                   text-emerald-700
-                                                   border border-emerald-200">
-
-                                            <span
-                                                class="w-1.5 h-1.5
-                                                       rounded-full
-                                                       bg-emerald-500">
-                                            </span>
-
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                                             Approved
-
                                         </span>
-
                                     @else
-
-                                        <span
-                                            class="inline-flex
-                                                   items-center gap-2
-                                                   px-3 py-1.5
-                                                   rounded-full
-                                                   text-xs font-semibold
-                                                   bg-amber-50
-                                                   text-amber-700
-                                                   border border-amber-200">
-
-                                            <span
-                                                class="w-1.5 h-1.5
-                                                       rounded-full
-                                                       bg-amber-500">
-                                            </span>
-
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                                             Pending
-
                                         </span>
-
                                     @endif
-
                                 </td>
 
-
-                                <!-- Action -->
-
-                                <td class="px-6 py-5">
-
-                                    @if(!$company->is_approved)
-
-                                        <form
-                                            action="{{ route('admin.companies.approve', $company->id) }}"
-                                            method="POST">
-
-                                            @csrf
-
-                                            @method('PATCH')
-
-                                            <button
-                                                type="submit"
-                                                class="inline-flex
-                                                       items-center gap-2
-                                                       px-4 py-2
-                                                       rounded-lg
-                                                       bg-emerald-600
-                                                       hover:bg-emerald-700
-                                                       text-white
-                                                       text-sm
-                                                       font-semibold
-                                                       transition">
-
-                                                ✓
-                                                Approve
-
-                                            </button>
-
-                                        </form>
-
-                                    @else
-
-                                        <form
-                                            action="{{ route('admin.companies.reject', $company->id) }}"
-                                            method="POST">
-
-                                            @csrf
-
-                                            @method('PATCH')
-
-                                            <button
-                                                type="submit"
-                                                class="inline-flex
-                                                       items-center gap-2
-                                                       px-4 py-2
-                                                       rounded-lg
-                                                       bg-red-50
-                                                       hover:bg-red-100
-                                                       text-red-600
-                                                       border border-red-200
-                                                       text-sm
-                                                       font-semibold
-                                                       transition">
-
-                                                ✕
-                                                Reject
-
-                                            </button>
-
-                                        </form>
-
-                                    @endif
-
+                                <!-- Registered Date -->
+                                <td class="px-5 py-4 text-xs text-slate-500 whitespace-nowrap">
+                                    {{ $company->created_at ? $company->created_at->format('M d, Y') : 'N/A' }}
                                 </td>
 
-                            </tr>
+                                <!-- Actions -->
+                                <td class="px-5 py-4 text-right whitespace-nowrap">
+                                    <div class="inline-flex items-center gap-1.5">
+                                        <!-- View Details -->
+                                        <a href="{{ route('admin.companies.show', $company->id) }}"
+                                           class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors">
+                                            View
+                                        </a>
 
-                        @empty
-
-                            <!-- Empty State -->
-
-                            <tr>
-
-                                <td
-                                    colspan="6"
-                                    class="px-6 py-16">
-
-                                    <div
-                                        class="flex flex-col
-                                               items-center
-                                               justify-center
-                                               text-center">
-
-                                        <div
-                                            class="w-16 h-16 rounded-2xl
-                                                   bg-slate-100
-                                                   text-slate-400
-                                                   flex items-center
-                                                   justify-center
-                                                   mb-4">
-
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                class="w-8 h-8"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor">
-
-                                                <path
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                    stroke-width="1.5"
-                                                    d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4M9 10h1m4 0h1m-6 4h1m4 0h1" />
-
-                                            </svg>
-
-                                        </div>
-
-                                        <h3
-                                            class="text-lg font-semibold
-                                                   text-slate-800">
-
-                                            No companies registered
-
-                                        </h3>
-
-                                        <p
-                                            class="text-sm text-slate-500
-                                                   mt-1">
-
-                                            Registered companies will appear here.
-
-                                        </p>
-
+                                        @if(!$company->is_approved)
+                                            <!-- Approve Form -->
+                                            <form action="{{ route('admin.companies.approve', $company->id) }}"
+                                                  method="POST"
+                                                  onsubmit="return confirm('Are you sure you want to approve {{ addslashes($company->company_name) }}?');">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit"
+                                                        class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-colors">
+                                                    Approve
+                                                </button>
+                                            </form>
+                                        @else
+                                            <!-- Reject Form -->
+                                            <form action="{{ route('admin.companies.reject', $company->id) }}"
+                                                  method="POST"
+                                                  onsubmit="return confirm('Are you sure you want to reject {{ addslashes($company->company_name) }}? Their employer session will be revoked and job postings hidden.');">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit"
+                                                        class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition-colors">
+                                                    Reject
+                                                </button>
+                                            </form>
+                                        @endif
                                     </div>
-
                                 </td>
-
                             </tr>
-
-                        @endforelse
-
+                        @endforeach
                     </tbody>
-
                 </table>
-
             </div>
 
-        </div>
+            <!-- Pagination Bar -->
+            @if($companies->hasPages())
+                <div class="p-4 border-t border-slate-100 bg-slate-50/50">
+                    {{ $companies->links() }}
+                </div>
+            @endif
+        @else
+            <!-- Empty State -->
+            <div class="py-16 px-6 text-center">
+                <div class="w-14 h-14 rounded-2xl bg-slate-100 text-slate-400 mx-auto flex items-center justify-center mb-3">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <rect x="4" y="2" width="16" height="20" rx="2" stroke-width="2"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 22v-4h6v4M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01"/>
+                    </svg>
+                </div>
+                @if(request()->filled('search') || request()->filled('status'))
+                    <h4 class="text-sm font-bold text-slate-900">No matching companies found</h4>
+                    <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                        No companies matched your current search filters. Try adjusting your query or resetting filters.
+                    </p>
+                    <div class="mt-4">
+                        <a href="{{ route('admin.companies') }}"
+                           class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors shadow-xs">
+                            Clear All Filters
+                        </a>
+                    </div>
+                @else
+                    <h4 class="text-sm font-bold text-slate-900">No companies registered yet</h4>
+                    <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                        When employers register on JobPortal, their accounts and verification details will appear here.
+                    </p>
+                @endif
+            </div>
+        @endif
+    </div>
 
-
-        <!-- Footer -->
-
-        <footer
-            class="text-center text-xs
-                   text-slate-400 mt-8 pb-5">
-
-            © {{ date('Y') }} JobPortal Admin Panel.
-            All rights reserved.
-
-        </footer>
-
-    </main>
-
-</body>
-
-</html>
+</div>
+@endsection
