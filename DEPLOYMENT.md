@@ -330,3 +330,81 @@ If an issue occurs immediately after a deployment:
    sudo systemctl reload php8.2-fpm
    php artisan up
    ```
+
+---
+
+## 7. EthioDeploy Free Tier Deployment (Zero Cost, No Cloudflare R2)
+
+This deployment profile is specifically optimized for portfolio, demonstration, and resume showcase purposes with **$0 hosting cost**, zero external storage accounts, and zero credit cards.
+
+### A. Automatic Platform Build Process
+EthioDeploy detects the Laravel 12 application and automatically executes the following build commands during the deployment pipeline:
+```bash
+composer install --no-dev --optimize-autoloader
+npm run build
+```
+
+EthioDeploy also automatically handles production caching:
+- `php artisan config:cache`
+- `php artisan route:cache`
+- `php artisan view:cache`
+
+*(You do not need to manually repeat these caching commands unless troubleshooting requires it).*
+
+### B. Recommended Start Command
+In the EthioDeploy dashboard under **Settings > Build & Deploy**, set the **Start Command** to:
+
+```bash
+php artisan migrate --force && ethiodeploy-start
+```
+
+> [!NOTE]
+> **Why this Start Command?**  
+> By prepending `php artisan migrate --force &&`, any new or pending database migrations execute automatically before the `ethiodeploy-start` web server launches. This guarantees the MySQL database schema is always up to date and in sync with the codebase on every deployment.
+
+### C. Local Resume Storage & Ephemeral Filesystem Notice
+- **Configuration:** `FILESYSTEM_DISK=local` and `RESUME_DISK=local`.
+- **Private Isolation:** Resumes are saved privately in `storage/app/private/resumes` outside the web root (`public/`). No resumes are ever exposed over direct HTTP URLs.
+- **Authorized Streaming:** All downloads pass through `StudentJobController@downloadResume`, requiring active authentication (Admin guard, owning Student session, or approved owning Company session). Unauthorized requests return `HTTP 403`.
+
+> [!WARNING]
+> **Ephemeral Storage Notice:**  
+> On free container hosting plans like EthioDeploy, the application filesystem is ephemeral. While database records (users, companies, jobs, applications) are permanently stored in Managed MySQL and persist indefinitely, physical resume files uploaded to `storage/app/private/resumes` reside on the container's local disk and may disappear after container replacements, system sleeps, or new code redeployments. For a portfolio showcase, this is expected and normal. Cloudflare R2 or external S3 storage is not required.
+
+### D. Required Dashboard Environment Variables
+Configure **only** these environment variables in the EthioDeploy Project Settings (no Cloudflare R2 credentials):
+
+```ini
+APP_NAME=JobPortal
+APP_ENV=production
+APP_KEY=base64:... # Generate via: php artisan key:generate --show
+APP_DEBUG=false
+APP_URL=https://<your-project>.ethiodeploy.app
+
+DB_CONNECTION=mysql
+DATABASE_URL=<EthioDeploy Managed MySQL Connection String>
+
+SESSION_DRIVER=database
+SESSION_SECURE_COOKIE=true
+CACHE_STORE=database
+QUEUE_CONNECTION=sync
+
+FILESYSTEM_DISK=local
+RESUME_DISK=local
+
+INITIAL_ADMIN_NAME="System Administrator"
+INITIAL_ADMIN_EMAIL=admin@example.com
+INITIAL_ADMIN_PASSWORD=YourSecureAdminPassword123!
+```
+
+### E. Initial Administrator Creation (One-Time Console Step)
+After the first successful deployment has started and the application is live, open the **EthioDeploy Console / Terminal** and run:
+
+```bash
+php artisan db:seed --class=AdminSeeder --force
+```
+
+- **Configuration-driven:** `AdminSeeder` reads credentials from `config/auth.php` (`initial_admin` section) which reads `INITIAL_ADMIN_EMAIL`, `INITIAL_ADMIN_PASSWORD`, and `INITIAL_ADMIN_NAME`. This is 100% compatible with production configuration caching.
+- **Idempotent & Safe:** If an administrator account already exists, the command skips safely without resetting or duplicating accounts.
+- **Immediate Access:** You can now log into your production admin dashboard at `https://<your-project>.ethiodeploy.app/admin/login`.
+
